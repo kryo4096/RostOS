@@ -1,9 +1,9 @@
-mod color;
 mod buffer;
+mod color;
 mod writer;
 
 pub use self::color::*;
-use self::writer::*; 
+use self::writer::*;
 
 use core::fmt;
 use core::fmt::Write;
@@ -26,6 +26,9 @@ pub fn clear() {
     WRITER.lock().clear()
 }
 
+pub fn del() {
+    WRITER.lock().del()
+}
 macro_rules! print {
     ($($arg:tt)*) => ($crate::vga::write_fmt(format_args!($($arg)*)));
 }

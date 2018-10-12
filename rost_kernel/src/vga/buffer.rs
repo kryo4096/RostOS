@@ -37,7 +37,7 @@ impl VGABuffer {
 
     /// Puts a colored ASCII character at the specified position. Will panic if the position is out of bounds!
     pub fn put_char(&mut self, x: usize, y: usize, chr: u8, bg_color: Color, fg_color: Color) {
-        if(x >= self.width || y >= self.height) {
+        if x >= self.width || y >= self.height {
             panic!("VGA Index out of bounds!");
         }
         let index = (y * self.width + x) as isize;

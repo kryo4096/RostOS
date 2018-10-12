@@ -4,8 +4,15 @@ version = "0.1.0"
 authors = ["kryo4096 <kryo4096@gmail.com>"]
 
 [dependencies]
-spin = "*"
-bootloader_precompiled = "0.3.0"
+spin = "0.4"
+bootloader_precompiled = "0.3"
+x86_64 = "0.2"
+linked_list_allocator = "0.6"
+
+[dependencies.lazy_static]
+features=["spin_no_std"]
+version="1.1"
 
 [package.metadata.bootimage]
 default-target = "x86_64-rust_kernel.json"
+output = "bootimage-rust_kernel.bin" 

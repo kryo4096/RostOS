@@ -1,13 +1,13 @@
 use super::buffer::*;
 use super::color::*;
 
-use core::fmt::Write;
+use core::fmt::{self, Write};
 
 use spin::Mutex;
 
-pub static WRITER : Mutex<Writer> = Mutex::new(Writer {
+pub static WRITER: Mutex<Writer> = Mutex::new(Writer {
     buffer: &VGA_BUFFER,
-    cursor: (0,0),
+    cursor: (0, 0),
     bg_color: Color::Black,
 });
 
@@ -31,8 +31,33 @@ impl Writer {
                 // not part of printable ASCII range
                 _ => self.write_char(0xfe, fg_color),
             }
-
         }
+    }
+
+    pub fn del(&mut self) {
+        if self.cursor.0 == 0 {
+            if self.cursor.1 == 0 {
+                return;
+            }
+            self.cursor.0 = self.buffer.lock().width() - 1;
+            self.cursor.1 -= 1;
+            self.buffer.lock().put_char(
+                self.cursor.0,
+                self.cursor.1,
+                b' ',
+                self.bg_color,
+                Color::White,
+            );
+            return;
+        }
+        self.cursor.0 -= 1;
+        self.buffer.lock().put_char(
+            self.cursor.0,
+            self.cursor.1,
+            b' ',
+            self.bg_color,
+            Color::White,
+        );
     }
 
     pub fn write_char(&mut self, chr: u8, fg_color: Color) {
@@ -45,7 +70,9 @@ impl Writer {
             self.new_line()
         }
 
-        self.buffer.lock().put_char(self.cursor.0, self.cursor.1,chr, self.bg_color, fg_color);
+        self.buffer
+            .lock()
+            .put_char(self.cursor.0, self.cursor.1, chr, self.bg_color, fg_color);
 
         self.cursor.0 += 1;
     }
@@ -54,7 +81,7 @@ impl Writer {
         let h = self.buffer.lock().height();
         if self.cursor.1 >= h - 1 {
             self.buffer.lock().shift_up();
-            self.buffer.lock().clear_line(h-1, self.bg_color);
+            self.buffer.lock().clear_line(h - 1, self.bg_color);
         } else {
             self.cursor.1 += 1;
         }
@@ -64,12 +91,12 @@ impl Writer {
 
     pub fn clear(&mut self) {
         self.buffer.lock().clear(self.bg_color);
-        self.cursor = (0,0);
+        self.cursor = (0, 0);
     }
 }
 
 impl Write for Writer {
-    fn write_str(&mut self, s: &str) -> Result<(),core::fmt::Error> {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
         self.write_str(s, Color::White);
         Ok(())
     }
