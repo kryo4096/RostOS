@@ -10,3 +10,7 @@ int_80:
 _start:
     call kmain
 
+.global test_code
+test_code:
+    mov rax, 409600
+    call rax

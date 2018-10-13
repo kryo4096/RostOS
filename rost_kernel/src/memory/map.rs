@@ -18,8 +18,8 @@ pub unsafe fn load() {
         };
 
         MEMORY_MAP[i] = MemoryRegion::new(
-            region.range.start_frame_number as usize,
-            region.range.end_frame_number as usize - region.range.start_frame_number as usize,
+            region.range.start_frame_number as u64,
+            region.range.end_frame_number as u64 - region.range.start_frame_number as u64,
             rtype,
         );
         i += 1;
@@ -53,8 +53,8 @@ pub const REGION_USED: RegionType = 0x2;
 
 #[derive(Copy, Clone)]
 pub struct MemoryRegion {
-    start: usize,
-    length: usize,
+    pub start: u64,
+    pub length: u64,
     rtype: RegionType,
 }
 
@@ -65,7 +65,7 @@ impl MemoryRegion {
         rtype: REGION_EMPTY,
     };
 
-    fn new(start: usize, length: usize, rtype: RegionType) -> Self {
+    fn new(start: u64, length: u64, rtype: RegionType) -> Self {
         Self {
             start,
             length,
@@ -74,6 +74,6 @@ impl MemoryRegion {
     }
 
     pub fn is_free(&self) -> bool {
-        self.rtype == REGION_FREE
+        self.rtype == REGION_FREE && self.length > 0
     }
 }

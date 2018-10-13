@@ -8,14 +8,10 @@ pub fn panic(
     panic_info: &PanicInfo,
 ) -> ! {
 
-    vga::set_background(vga::Color::Red);
-    vga::clear();
+    println!("panic at: {:?}",panic_info.location().unwrap());
 
-    if let Some(s) = panic_info.payload().downcast_ref::<&str>() {
-        println!("panic occurred: {:?}", s);
-    } else {
-        println!("panic occurred");
-    }
+
+
 
     loop {}
 }
