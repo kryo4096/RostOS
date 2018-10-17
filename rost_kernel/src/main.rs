@@ -22,22 +22,20 @@ mod interrupt;
 mod memory;
 mod panic;
 mod time;
+mod consts;
 
 pub use panic::panic;
 
-use bootloader_precompiled::bootinfo::BootInfo;
-use vga::*;
-
 use x86_64::structures::paging::*;
-use x86_64::VirtAddr;
+use x86_64::{VirtAddr, PhysAddr};
 
-pub const TEST_CODE_ADDR: *mut [u8; 4096] = (100 * memory::PAGE_SIZE) as *mut _;
+pub const TEST_CODE_ADDR: *mut [u8; 4096] = (100 * consts::PAGE_SIZE) as *mut _;
 
 global_asm!(include_str!("routines.S"));
 
 extern "C" {
     fn int_80();
-    fn test_code();
+    fn _call(addr: u64);
 }
 
 pub fn io_wait() {
@@ -54,8 +52,22 @@ pub unsafe extern "C" fn kprintln(ptr: *const u8, len: usize) {
     println!("{}", s);
 }
 
+static HELLO : usize = 6;
+
 #[no_mangle]
-pub extern "C" fn kmain() -> ! {
+pub extern "C" fn kmain() -> !{
+
+    let info = ::boot_info::get_info();
+
+    let [rsp,rip] : [u64;2];
+
+    unsafe {
+        asm!("mov $0, rsp":"=r"(rsp):::"intel");
+        asm!("lea $0, [rip+0]":"=r"(rip):::"intel");
+    }
+
+    println!("rsp=0x{:x}, rip=0x{:x}", rsp, rip);
+
     let mut frame_allocator;
 
     unsafe {
@@ -63,8 +75,11 @@ pub extern "C" fn kmain() -> ! {
         interrupt::init();
     };
 
-    let mut p4 = unsafe { &mut *(0xf_fff_fff_fff_fff_000 as *mut PageTable) };
+    let mut p4 = unsafe { &mut *(consts::P4_TABLE_ADDR as *mut PageTable) };
+
     let mut rec = RecursivePageTable::new(p4).unwrap();
+
+
 
     let flags = PageTableFlags::PRESENT | PageTableFlags::WRITABLE;
 
@@ -79,13 +94,15 @@ pub extern "C" fn kmain() -> ! {
     .unwrap()
     .flush();
 
+    let program = include_bytes!("program"); 
+
     unsafe {
-        *TEST_CODE_ADDR = [0;4096];
-        (*TEST_CODE_ADDR)[0] = 0xCA;
-        test_code();
+        for i in 0..program.len() {
+            (*TEST_CODE_ADDR)[i] = program[i];
+        }
+        _call(TEST_CODE_ADDR as u64);
     }
 
-    println!("woah");
+    loop{}
 
-    loop {}
 }

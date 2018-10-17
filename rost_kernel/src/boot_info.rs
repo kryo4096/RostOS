@@ -1,6 +1,5 @@
 use bootloader_precompiled::bootinfo::BootInfo;
 
-#[no_mangle]
 static mut BOOT_INFO: Option<&'static BootInfo> = None;
 
 pub fn get_info() -> &'static BootInfo {

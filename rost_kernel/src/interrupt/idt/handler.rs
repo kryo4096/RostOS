@@ -2,7 +2,10 @@ use x86_64::structures::idt::ExceptionStackFrame;
 use x86_64::structures::idt::PageFaultErrorCode;
 
 pub extern "x86-interrupt" fn breakpoint(frame: &mut ExceptionStackFrame) {
-    println!("EXCEPTION: BREAKPOINT\n{:#?}", frame);
+    println!(
+        "breakpoint \nrip=0x{:x}",
+        frame.instruction_pointer.as_u64()
+    );
 }
 
 pub extern "x86-interrupt" fn page_fault(
@@ -18,7 +21,19 @@ pub extern "x86-interrupt" fn double_fault(frame: &mut ExceptionStackFrame, _err
     loop {}
 }
 
-pub extern "x86-interrupt" fn syscall(frame: &mut ExceptionStackFrame) {}
+pub extern "x86-interrupt" fn syscall(frame: &mut ExceptionStackFrame) {
+    let n: u64;
+    let arg1: u64;
+    unsafe {
+        asm!("mov $0, rdi" : "=r"(n) ::: "intel");
+        asm!("mov $0, rsi" : "=r"(arg1) ::: "intel");
+    }
+
+    match n {
+        0 => println!("{}", arg1),
+        _ => println!("Unknown syscall!"),
+    }
+}
 
 pub extern "x86-interrupt" fn clock(frame: &mut ExceptionStackFrame) {
     ::time::tick();

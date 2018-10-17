@@ -1,11 +1,24 @@
+use consts;
+use x86_64::structures::paging::*;
+
 mod map;
 mod frame_allocator;
 
-pub const PAGE_SIZE: u64 = 0x1000; // frame and page size is 4 KiB
 
 pub unsafe fn init() -> frame_allocator::FrameStackAllocator {
     map::load();
-    map::print();
-
+    
     frame_allocator::FrameStackAllocator::new(&mut map::MEMORY_MAP)
+}
+
+pub fn debug_page_table() {
+    let mut p4 = unsafe { &mut *(consts::P4_TABLE_ADDR as *mut PageTable) };
+
+    for i in 0..511 {
+        let ent = &p4[i];
+
+        if ent.flags().contains(PageTableFlags::PRESENT) {
+            println!("{}: {:?}",i,ent.flags());
+        }
+    }
 }

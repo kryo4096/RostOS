@@ -9,8 +9,9 @@ int_80:
 .global _start
 _start:
     call kmain
+    int3
 
-.global test_code
-test_code:
-    mov rax, 409600
-    call rax
+.global _call
+_call:
+    call rdi
+    ret

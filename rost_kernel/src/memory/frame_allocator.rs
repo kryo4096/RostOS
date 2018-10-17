@@ -1,9 +1,7 @@
 use super::map::*;
-use super::PAGE_SIZE;
+use consts::*;
 use x86_64::structures::paging::{FrameAllocator, FrameDeallocator, PhysFrame, Size4KiB};
 use x86_64::PhysAddr;
-
-const FRAME_STACK_SIZE: usize = 0x100;
 
 struct FrameStack {
     frames: [u64; FRAME_STACK_SIZE],
@@ -103,7 +101,7 @@ impl FrameDeallocator<Size4KiB> for FrameStackAllocator {
     fn dealloc(&mut self, frame: PhysFrame<Size4KiB>) {
         let frame = frame.start_address().as_u64() as u64 / PAGE_SIZE;
         if !self.free_stack.push(frame) {
-            println!("Framestack full!");
+            println!("framestack full!");
         }
     }
 }

@@ -1,6 +1,6 @@
 use bootloader_precompiled::bootinfo::MemoryRegionType;
 
-use super::PAGE_SIZE;
+use consts::PAGE_SIZE;
 
 pub type MemoryMap = [MemoryRegion; 128];
 
