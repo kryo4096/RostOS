@@ -13,3 +13,12 @@ pub fn get_info() -> &'static BootInfo {
         }
     }
 }
+
+pub fn print_map() {
+    let info = get_info();
+
+    for entry in info.memory_map.iter() {
+        println!("{:?}", entry);
+    }
+
+}

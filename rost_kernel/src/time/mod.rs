@@ -10,3 +10,9 @@ pub fn tick() {
 pub fn get() -> u64 {
     TIME.load(Ordering::SeqCst)
 }
+
+pub fn wait(ticks: u64) {
+    let time = get();
+
+    while get() - time <= ticks {}
+}

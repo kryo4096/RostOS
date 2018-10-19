@@ -23,19 +23,21 @@ mod memory;
 mod panic;
 mod time;
 mod consts;
+mod syscall;
 
 pub use panic::panic;
 
 use x86_64::structures::paging::*;
 use x86_64::{VirtAddr, PhysAddr};
 
-pub const TEST_CODE_ADDR: *mut [u8; 4096] = (100 * consts::PAGE_SIZE) as *mut _;
+pub const TEST_CODE_ADDR: *mut [u8; 4096] = (0) as *mut _;
 
 global_asm!(include_str!("routines.S"));
 
 extern "C" {
     fn int_80();
     fn _call(addr: u64);
+    fn _switch(stack_addr: u64, lower_addr: u64);
 }
 
 pub fn io_wait() {
@@ -45,29 +47,21 @@ pub fn io_wait() {
     }
 }
 
-pub unsafe extern "C" fn kprintln(ptr: *const u8, len: usize) {
-    let slice = core::slice::from_raw_parts(ptr, len);
-    let s = core::str::from_utf8_unchecked(slice);
+#[no_mangle]
+pub extern "C" fn kstart() -> ! {
+    let mut p4 = unsafe { &mut *(consts::P4_TABLE_ADDR as *mut PageTable) };
+    let mut rec = RecursivePageTable::new(p4).unwrap();
 
-    println!("{}", s);
+    kmain();
+
 }
 
-static HELLO : usize = 6;
-
 #[no_mangle]
-pub extern "C" fn kmain() -> !{
+pub extern "C" fn kmain() -> ! {
 
     let info = ::boot_info::get_info();
 
-    let [rsp,rip] : [u64;2];
-
-    unsafe {
-        asm!("mov $0, rsp":"=r"(rsp):::"intel");
-        asm!("lea $0, [rip+0]":"=r"(rip):::"intel");
-    }
-
-    println!("rsp=0x{:x}, rip=0x{:x}", rsp, rip);
-
+    boot_info::print_map();
     let mut frame_allocator;
 
     unsafe {
@@ -79,22 +73,20 @@ pub extern "C" fn kmain() -> !{
 
     let mut rec = RecursivePageTable::new(p4).unwrap();
 
-
-
-    let flags = PageTableFlags::PRESENT | PageTableFlags::WRITABLE;
-
-    let frame = frame_allocator.alloc().expect("no more frames!");
+    
+    memory::debug_page_table();
 
     rec.map_to(
         Page::containing_address(VirtAddr::from_ptr(TEST_CODE_ADDR)),
-        frame,
-        flags,
+        frame_allocator.alloc().unwrap(),
+        PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
         &mut frame_allocator,
     )
     .unwrap()
     .flush();
 
-    let program = include_bytes!("program"); 
+
+    let program = include_bytes!("../program"); 
 
     unsafe {
         for i in 0..program.len() {

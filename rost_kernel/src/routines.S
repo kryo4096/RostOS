@@ -8,7 +8,7 @@ int_80:
 
 .global _start
 _start:
-    call kmain
+    call kstart
     int3
 
 .global _call

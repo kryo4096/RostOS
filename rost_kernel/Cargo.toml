@@ -15,4 +15,3 @@ version="1.1"
 
 [package.metadata.bootimage]
 default-target = "x86_64-rust_kernel.json"
-output = "bootimage-rust_kernel.bin" 

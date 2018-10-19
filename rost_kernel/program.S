@@ -1,12 +1,11 @@
 bits 64
 
 mov rdi, 0
-mov rsi, str
+lea rsi, [data]
+mov rdx, 14
 int 80h
+
 ret
 
-int3
-
-str:
-db 'Hello, World!'
-db 0
+data:
+db 'Hello, Kernel!'
