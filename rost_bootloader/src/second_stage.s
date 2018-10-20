@@ -10,6 +10,18 @@ second_stage:
     lea si, second_stage_start_str
     call println
 
+set_target_operating_mode:
+    # Some BIOSs assume the processor will only operate in Legacy Mode. We change the Target
+    # Operating Mode to "Long Mode Target Only", so the firmware expects each CPU to enter Long Mode
+    # once and then stay in it. This allows the firmware to enable mode-specifc optimizations.
+    # We save the flags, because CF is set if the callback is not supported (in which case, this is
+    # a NOP)
+    pushf
+    mov ax, 0xec00
+    mov bl, 0x2
+    int 0x15
+    popf
+
 load_kernel_from_disk:
     # start of memory buffer
     lea eax, _kernel_buffer
@@ -44,7 +56,11 @@ load_next_kernel_block_from_disk:
     push ecx
     push esi
     mov ecx, 512 / 4
+    # move with zero extension
+    # because we are moving a word ptr
+    # to esi, a 32-bit register.
     movzx esi, word ptr [dap_buffer_addr]
+    # move from esi to edi ecx times.
     rep movsd [edi], [esi]
     pop esi
     pop ecx
@@ -65,13 +81,7 @@ check_cpu:
     call check_cpuid
     call check_long_mode
 
-disable_irqs:
-    mov al, 0xFF     # Out 0xFF to 0xA1 and 0x21 to disable all IRQs.
-    out 0xA1, al
-    out 0x21, al
-
-    nop
-    nop
+    cli                   # disable interrupts
 
     lidt zero_idt         # Load a zero length IDT so that any NMI causes a triple fault.
 
@@ -244,7 +254,7 @@ gdt_64_pointer:
 
 long_mode:
     # call load_elf with kernel start address, size, and memory map as arguments
-    movabs rdi, 0x400000
+    movabs rdi, 0x400000 # move absolute 64-bit to register
     mov rsi, _kib_kernel_size
     lea rdx, _memory_map
     movzx rcx, word ptr mmap_ent
