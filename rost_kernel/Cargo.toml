@@ -7,6 +7,7 @@ authors = ["kryo4096 <kryo4096@gmail.com>"]
 spin = "0.4"
 bootloader_precompiled = "0.3"
 x86_64 = "0.2"
+bitflags = "1.0"
 linked_list_allocator = "0.6"
 
 [dependencies.lazy_static]

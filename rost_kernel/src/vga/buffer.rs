@@ -2,7 +2,7 @@ use super::color::*;
 
 use spin::Mutex;
 
-use core::slice;
+use consts::*;
 
 /// Represents the VGA buffer which stores ASCII characters and their colors. Anything written to it will appear on the screen. Origin is top-left.
 pub struct VGABuffer {
@@ -18,7 +18,7 @@ unsafe impl Sync for VGABuffer {}
 impl VGABuffer {
     
     /// Creates a new handle to the VGA buffer. This function only makes sense when it is called with addr=0xb8000. 
-    const unsafe fn new(addr: usize, width: usize, height: usize) -> Self {
+    const unsafe fn new(addr: u64, width: usize, height: usize) -> Self {
         Self {
             buffer_ptr: addr as _, // convert usize to buffer pointer (extremely unsafe)
             width, // buffer width, can cause memory issues if set incorrectly
@@ -98,4 +98,4 @@ impl VGABuffer {
 }
 
 /// The VGA buffer at 0xb8000
-pub static VGA_BUFFER: Mutex<VGABuffer> = Mutex::new(unsafe {VGABuffer::new(0xb8000, 80, 25)});
+pub static VGA_BUFFER: Mutex<VGABuffer> = Mutex::new(unsafe {VGABuffer::new(VGA_BUFFER_VADDR, 80, 25)});

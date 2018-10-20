@@ -2,7 +2,7 @@ use consts;
 use x86_64::structures::paging::*;
 
 mod map;
-mod frame_allocator;
+pub mod frame_allocator;
 
 pub unsafe fn init() -> frame_allocator::FrameStackAllocator {
     map::load();

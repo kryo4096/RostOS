@@ -1,9 +1,11 @@
 use vga;
 
 use core::panic::PanicInfo;
+use core::alloc::Layout;
 
-#[panic_handler]
+
 #[no_mangle]
+#[panic_handler]
 pub fn panic(
     panic_info: &PanicInfo,
 ) -> ! {
@@ -16,3 +18,7 @@ pub fn panic(
     loop {}
 }
 
+#[alloc_error_handler]
+pub fn oom(_:Layout) -> ! {
+    panic!("Out of Memory!")
+}

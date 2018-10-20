@@ -6840,7 +6840,7 @@ Disassembly of section .text:
   208b12:	75 11                	jne    208b25 <_ZN11rust_kernel7syscall7syscall17he5c1ea1f7ceffbd6E+0x135>
   208b14:	48 8b 7c 24 30       	mov    rdi,QWORD PTR [rsp+0x30]
   208b19:	48 8b 74 24 40       	mov    rsi,QWORD PTR [rsp+0x40]
-  208b1e:	e8 1d 00 00 00       	call   208b40 <_ZN11rust_kernel7syscall8kprintln17h52b737c7a9571f23E>
+  208b1e:	e8 1d 00 00 00       	call   208b40 <_ZN11rust_kernel7syscall8println17h52b737c7a9571f23E>
   208b23:	eb 0e                	jmp    208b33 <_ZN11rust_kernel7syscall7syscall17he5c1ea1f7ceffbd6E+0x143>
   208b25:	48 8d 3d 6c eb 00 00 	lea    rdi,[rip+0xeb6c]        # 217698 <_ZN11rust_kernel3vga6writer6WRITER17h25e0541f3f3878f2E+0x1668>
   208b2c:	e8 9f b5 00 00       	call   2140d0 <_ZN4core9panicking5panic17h8e7eea3eb5c7908eE>
@@ -6853,7 +6853,7 @@ Disassembly of section .text:
   208b3e:	cc                   	int3   
   208b3f:	cc                   	int3   
 
-0000000000208b40 <_ZN11rust_kernel7syscall8kprintln17h52b737c7a9571f23E>:
+0000000000208b40 <_ZN11rust_kernel7syscall8println17h52b737c7a9571f23E>:
   208b40:	48 81 ec a8 00 00 00 	sub    rsp,0xa8
   208b47:	48 89 7c 24 28       	mov    QWORD PTR [rsp+0x28],rdi
   208b4c:	48 89 74 24 30       	mov    QWORD PTR [rsp+0x30],rsi

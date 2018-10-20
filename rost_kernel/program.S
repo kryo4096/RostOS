@@ -5,7 +5,8 @@ lea rsi, [data]
 mov rdx, 14
 int 80h
 
-ret
+spin: 
+jmp spin
 
 data:
 db 'Hello, Kernel!'
