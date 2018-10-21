@@ -1,4 +1,4 @@
-use bootloader_precompiled::bootinfo::BootInfo;
+use bootloader::bootinfo::BootInfo;
 
 static mut BOOT_INFO: Option<&'static BootInfo> = None;
 
@@ -7,7 +7,7 @@ pub fn get_info() -> &'static BootInfo {
         if let Some(_boot_info) = BOOT_INFO {
             _boot_info
         } else {
-            BOOT_INFO = Some(&*(0xb0_071f_0000 as *const BootInfo));
+            BOOT_INFO = Some(&*(0xffff820000000000 as *const BootInfo));
 
             get_info()
         }

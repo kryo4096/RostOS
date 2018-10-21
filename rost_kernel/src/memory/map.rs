@@ -1,4 +1,4 @@
-use bootloader_precompiled::bootinfo::MemoryRegionType;
+use bootloader::bootinfo::MemoryRegionType;
 
 use consts::PAGE_SIZE;
 

@@ -1,0 +1,8 @@
+#!/bin/bash
+pushd
+cd ../bootloader
+cargo xbuild --target x86_64-bootloader --release
+popd
+cp ../bootloader/target/x86_64-bootloader/b
+objcopy -O binary -S target/x86_64-bootloader/release/bootloader bootimage.bin
+qemu-system-x86_64 -hda bootimage.bin -d int -s

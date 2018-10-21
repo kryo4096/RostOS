@@ -1,0 +1,12 @@
+args in order:
+rdi, rsi, rdx, rcx, r8, r9
+
+to syscall int 80h
+
+rdi syscall number
+
+
+0 - println
+ARGS
+    rdi = message pointer
+    rsi = character count

@@ -9,9 +9,12 @@ pub unsafe fn init() -> frame_allocator::FrameStackAllocator {
     frame_allocator::FrameStackAllocator::new(&mut map::MEMORY_MAP)
 }
 
-pub fn debug_page_table() {
-    let mut p4 = unsafe { &mut *(consts::P4_TABLE_ADDR as *mut PageTable) };
+pub fn get_p4() -> RecursivePageTable<'static> {
+    let mut p4 = unsafe { &mut *(consts::P4_TABLE_ADDR as *mut PageTable) }
+    let 
+}
 
+pub fn debug_page_table() {
     for i in 0..511 {
         let ent = &p4[i];
 

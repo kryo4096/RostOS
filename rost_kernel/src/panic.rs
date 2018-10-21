@@ -22,3 +22,5 @@ pub fn panic(
 pub fn oom(_:Layout) -> ! {
     panic!("Out of Memory!")
 }
+
+#[lang = "eh_personality"] extern fn eh_personality() {}

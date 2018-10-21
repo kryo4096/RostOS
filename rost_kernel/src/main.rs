@@ -7,10 +7,12 @@
     integer_atomics,
     asm,
     alloc,
-    alloc_error_handler
+    alloc_error_handler,
+    lang_items
 )]
+#![allow(unused)]
 
-extern crate bootloader_precompiled;
+extern crate bootloader;
 extern crate spin;
 extern crate x86_64;
 extern crate alloc;
@@ -46,7 +48,7 @@ static ALLOCATOR: LockedHeap = LockedHeap::empty();
 
 use consts::*;
 
-pub const TEST_CODE_ADDR: *mut [u8; 4096] = (0) as *mut _;
+pub const TEST_CODE_ADDR: *mut [u8; 4096] = USER_START as *mut _;
 
 global_asm!(include_str!("routines.S"));
 
@@ -65,6 +67,7 @@ pub fn io_wait() {
 
 #[no_mangle]
 pub extern "C" fn kstart() -> ! {
+
     let mut p4 = unsafe { &mut *(consts::P4_TABLE_ADDR as *mut PageTable) };
     let mut rec = RecursivePageTable::new(p4).unwrap();
 
@@ -84,7 +87,7 @@ pub extern "C" fn kstart() -> ! {
             frame_allocator.alloc().unwrap(),
             PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
             &mut frame_allocator,
-        );
+        ).expect("Unable to map kernel heap!").flush();
     }
 
     // map vga buffer to higher memory
@@ -93,7 +96,7 @@ pub extern "C" fn kstart() -> ! {
         PhysFrame::containing_address(PhysAddr::new(0xb8000)),
         PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
         &mut frame_allocator,
-    );
+    ).expect("Unable to map VGA buffer.");
 
     unsafe {
         ALLOCATOR.lock().init(KERNEL_HEAP_START as usize, KERNEL_HEAP_SIZE as usize);
@@ -107,14 +110,14 @@ pub extern "C" fn kstart() -> ! {
 pub extern "C" fn kmain(mut frame_allocator: FrameStackAllocator) -> ! {
     let rip : u64;
     unsafe {
-        asm!("lea $0, [rsp+0]" : "=r"(rip) ::: "intel");
+        asm!("lea $0, [rip+0]" : "=r"(rip) ::: "intel");
     }
 
     println!("0x{:x}",rip);
     
-    boot_info::print_map();
+    memory::debug_page_table();
     
-    let mut p4 = unsafe { &mut *(consts::P4_TABLE_ADDR as *mut PageTable) };
+    let mut p4 = unsafe { &mut *(P4_TABLE_ADDR as *mut PageTable) };
 
     let mut rec = RecursivePageTable::new(p4).unwrap();
 

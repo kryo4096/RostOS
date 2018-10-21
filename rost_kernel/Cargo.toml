@@ -5,7 +5,7 @@ authors = ["kryo4096 <kryo4096@gmail.com>"]
 
 [dependencies]
 spin = "0.4"
-bootloader_precompiled = "0.3"
+bootloader = {path = "../bootloader"}
 x86_64 = "0.2"
 bitflags = "1.0"
 linked_list_allocator = "0.6"
@@ -16,3 +16,7 @@ version="1.1"
 
 [package.metadata.bootimage]
 default-target = "x86_64-rust_kernel.json"
+
+[package.metadata.bootimage.bootloader]
+name = "bootloader"
+target = "x86_64-bootloader.json"
