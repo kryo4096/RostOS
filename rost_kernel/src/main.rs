@@ -20,7 +20,6 @@ extern crate linked_list_allocator;
 
 #[macro_use]
 extern crate lazy_static;
- 
 
 #[macro_use]
 mod vga;
