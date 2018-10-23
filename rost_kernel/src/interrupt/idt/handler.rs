@@ -21,23 +21,34 @@ pub extern "x86-interrupt" fn double_fault(frame: &mut ExceptionStackFrame, _err
     loop {}
 }
 
+#[naked]
 pub extern "x86-interrupt" fn syscall(frame: &mut ExceptionStackFrame) {
-    let rdi: u64;
-    let rsi: u64;
-    let rdx: u64;
-    let rcx: u64;
-    let r8: u64;
-    let r9: u64;
+    asm!("push, rdi" :::: "intel");
+    asm!("push, rsi" :::: "intel");
+    asm!("push, rdx" :::: "intel");
+    asm!("push, rcx" :::: "intel");
+    asm!("push, r8" :::: "intel");
+    asm!("push, r9" :::: "intel");
+
+
 
     unsafe {
-        asm!("mov $0, rdi" : "=r"(rdi) ::: "intel");
-        asm!("mov $0, rsi" : "=r"(rsi) ::: "intel");
-        asm!("mov $0, rdx" : "=r"(rdx) ::: "intel");
-        asm!("mov $0, rcx" : "=r"(rcx) ::: "intel");
-        asm!("mov $0, r8" : "=r"(r8) ::: "intel");
-        asm!("mov $0, r9" : "=r"(r9) ::: "intel");
-        ::syscall::syscall(rdi, rsi, rdx, rcx, r8, r9);
+
+        let ret = ::syscall::syscall(rdi, rsi, rdx, rcx, r8, r9);
+        if let Some(ret) = ret {
+            asm!("mov rax, $0" :: "r="(ret) :: "intel");
+        }
+        
     }
+
+    
+
+    asm!("push, rdi" :::: "intel");
+    asm!("push, rsi" :::: "intel");
+    asm!("push, rdx" :::: "intel");
+    asm!("push, rcx" :::: "intel");
+    asm!("push, r8" :::: "intel");
+    asm!("push, r9" :::: "intel");
 }
 
 pub extern "x86-interrupt" fn clock(frame: &mut ExceptionStackFrame) {

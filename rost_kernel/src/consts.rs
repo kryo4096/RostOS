@@ -17,3 +17,4 @@ pub const VGA_BUFFER_VADDR: u64 = KERNEL_START + 2*P4_ENTRY_SIZE;
 
 pub const USER_START: u64 = 0x0; // userspace
 pub const USER_STACK_TOP: u64 = 0x7F_FFFF_FFFF; // |   text   |  heap | ... | stack |
+pub const USER_STACK_SIZE: u64 = 0x100_0000;

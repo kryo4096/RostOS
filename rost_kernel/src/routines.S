@@ -11,7 +11,8 @@ _start:
     call kstart
     int3
 
-.global _call
-_call:
+.global proc_start
+proc_start:
     call rdi
+    mov rsp, rsi
     ret

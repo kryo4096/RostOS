@@ -8,7 +8,8 @@
     asm,
     alloc,
     alloc_error_handler,
-    lang_items
+    lang_items,
+    naked_functions
 )]
 #![allow(unused)]
 
@@ -53,7 +54,7 @@ global_asm!(include_str!("routines.S"));
 
 extern "C" {
     fn int_80();
-    fn _call(addr: u64);
+    fn proc_start(entry_point: u64, stack_ptr: u64);
     fn _switch(stack_addr: u64, lower_addr: u64);
 }
 
@@ -112,7 +113,7 @@ pub extern "C" fn kmain(mut frame_allocator: FrameStackAllocator) -> ! {
         asm!("lea $0, [rip+0]" : "=r"(rip) ::: "intel");
     }
 
-    println!("0x{:x}",rip);
+    println!("0x{:x}",KERNEL_START);
     
     memory::debug_page_table();
     
@@ -128,6 +129,17 @@ pub extern "C" fn kmain(mut frame_allocator: FrameStackAllocator) -> ! {
     )
     .unwrap()
     .flush();
+    for page in Page::range(Page::containing_address(VirtAddr::new(USER_STACK_TOP-USER_STACK_SIZE)),Page::<Size4KiB>::containing_address(VirtAddr::new(USER_STACK_TOP))) {
+        rec.map_to(
+            page,
+            frame_allocator.alloc().unwrap(),
+            PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
+            &mut frame_allocator,
+        )
+        .unwrap()
+        .flush();
+    }
+
 
     let program = include_bytes!("../program"); 
 
@@ -135,7 +147,7 @@ pub extern "C" fn kmain(mut frame_allocator: FrameStackAllocator) -> ! {
         for i in 0..program.len() {
             (*TEST_CODE_ADDR)[i] = program[i];
         }
-        _call(TEST_CODE_ADDR as u64);
+        proc_start(TEST_CODE_ADDR as u64, USER_STACK_TOP);
     }
 
     loop{}
