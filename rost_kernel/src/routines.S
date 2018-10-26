@@ -16,3 +16,10 @@ proc_start:
     call rdi
     mov rsp, rsi
     ret
+
+.global _syscall_handler
+_syscall_handler:
+    spin:
+    jmp spin
+    call __syscall
+

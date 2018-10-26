@@ -36,7 +36,7 @@ impl VGABuffer {
     }
 
     /// Puts a colored ASCII character at the specified position. Will panic if the position is out of bounds!
-    pub fn put_char(&mut self, x: usize, y: usize, chr: u8, bg_color: Color, fg_color: Color) {
+    pub fn put_char(&self, x: usize, y: usize, chr: u8, bg_color: Color, fg_color: Color) {
         if x >= self.width || y >= self.height {
             panic!("VGA Index out of bounds!");
         }
@@ -47,7 +47,7 @@ impl VGABuffer {
         }
     }
 
-    pub fn clear_line(&mut self, line: usize, bg_color: Color) {
+    pub fn clear_line(&self, line: usize, bg_color: Color) {
 
         let col = (bg_color as u8) << 4;
 
@@ -60,7 +60,7 @@ impl VGABuffer {
         }
     }
 
-    pub fn clear_bg_color(&mut self, bg_color: Color) {
+    pub fn clear_bg_color(&self, bg_color: Color) {
 
         let col = (bg_color as u8) << 4;
 
@@ -72,7 +72,7 @@ impl VGABuffer {
         }
     } 
 
-    pub fn clear(&mut self, bg_color: Color) {
+    pub fn clear(&self, bg_color: Color) {
 
         let col = (bg_color as u8) << 4;
 
@@ -85,7 +85,7 @@ impl VGABuffer {
         }
     } 
 
-    pub fn shift_up(&mut self) {
+    pub fn shift_up(&self) {
         for i in self.width*2..self.height*self.width*2 {
             let i = i as isize;
             unsafe {
@@ -98,4 +98,4 @@ impl VGABuffer {
 }
 
 /// The VGA buffer at 0xb8000
-pub static VGA_BUFFER: Mutex<VGABuffer> = Mutex::new(unsafe {VGABuffer::new(VGA_BUFFER_VADDR, 80, 25)});
+pub static VGA_BUFFER: VGABuffer = VGABuffer::new(VGA_BUFFER_VADDR, 80, 25;

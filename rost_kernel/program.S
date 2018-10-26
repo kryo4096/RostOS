@@ -2,8 +2,7 @@ bits 64
 
 spin:
     call time
-
-    mov rsi, time
+    mov rsi, rax
     call print
 jmp spin
 

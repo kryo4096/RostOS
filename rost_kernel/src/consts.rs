@@ -14,6 +14,7 @@ pub const KERNEL_HEAP_START: u64 = KERNEL_START + P4_ENTRY_SIZE;
 pub const KERNEL_HEAP_SIZE: u64 = 0x100_0000; // 16 MiB
 
 pub const VGA_BUFFER_VADDR: u64 = KERNEL_START + 2*P4_ENTRY_SIZE;
+pub const VGA_BUFFER_PADDR: u64 = 0xb8000;
 
 pub const USER_START: u64 = 0x0; // userspace
 pub const USER_STACK_TOP: u64 = 0x7F_FFFF_FFFF; // |   text   |  heap | ... | stack |
