@@ -1,9 +1,7 @@
 use x86_64::structures::idt::ExceptionStackFrame;
 use x86_64::structures::idt::PageFaultErrorCode;
-
-extern "x86-interrupt" {
-    pub fn _syscall_handler(frame: &mut ExceptionStackFrame);
-}
+use x86_64::instructions::port::Port;
+use consts::*;
 
 pub extern "x86-interrupt" fn breakpoint(frame: &mut ExceptionStackFrame) {
     println!(
@@ -20,12 +18,16 @@ pub extern "x86-interrupt" fn page_fault(
     loop {}
 }
 
-pub extern "x86-interrupt" fn double_fault(frame: &mut ExceptionStackFrame, _error_code: u64) {
-    println!("EXCEPTION: DOUBLE FAULT\n{:#?}", frame);
+pub extern "x86-interrupt" fn double_fault(frame: &mut ExceptionStackFrame, error_code: u64) {
+    println!("EXCEPTION: DOUBLE FAULT\n{:#?} ec: {}", frame, error_code);
     loop {}
 }
 
-/*
+pub extern "x86-interrupt" fn gpf(frame: &mut ExceptionStackFrame, error_code: u64) {
+    println!("EXCEPTION: GENERAL PROTECTION FAULT\n{:#?}", frame);
+    loop {}
+}
+
 pub extern "x86-interrupt" fn syscall(frame: &mut ExceptionStackFrame) {
     let (rdi, rsi, rdx, rcx, r8, r9);
 
@@ -38,13 +40,10 @@ pub extern "x86-interrupt" fn syscall(frame: &mut ExceptionStackFrame) {
         asm!("mov $0, r8" : "=r"(r8) ::: "intel");
         asm!("mov $0, r9" : "=r"(r9) ::: "intel");
 
-        let ret = ::syscall::syscall(rdi, rsi, rdx, rcx, r8, r9);
-        if let Some(ret) = ret {
-            asm!("mov rax, $0":: "r="(ret) :: "intel", "volatile")
-        }
-        
+        let _ = ::syscall::syscall(rdi, rsi, rdx, rcx, r8, r9);
+ 
     }
-}*/
+}
 
 pub extern "x86-interrupt" fn clock(frame: &mut ExceptionStackFrame) {
     ::time::tick();
@@ -52,3 +51,14 @@ pub extern "x86-interrupt" fn clock(frame: &mut ExceptionStackFrame) {
         ::interrupt::send_eoi(0);
     }
 }
+
+pub extern "x86-interrupt" fn keyboard(frame: &mut ExceptionStackFrame) {
+    let port = Port::new(KB_DATA_PORT);
+    unsafe {
+        let scancode : u8 = port.read();
+        ::interrupt::send_eoi(1);
+        println!("{}d",scancode);
+    }
+    
+}
+

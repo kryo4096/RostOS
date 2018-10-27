@@ -107,6 +107,9 @@ pub extern "C" fn kstart() -> ! {
             .init(KERNEL_HEAP_START as usize, KERNEL_HEAP_SIZE as usize);
     }
 
+    unsafe {
+        syscall::init();
+    }
     kmain(frame_allocator);
 }
 
@@ -146,8 +149,8 @@ pub fn run_program(frame_allocator: &mut FrameStackAllocator, program: &'static 
     }
 
     unsafe {
-        for (i, byte) in 0..program.iter().enumerate() {
-            (*TEST_CODE_ADDR)[i] = byte;
+        for (i, byte) in program.iter().enumerate() {
+            (*TEST_CODE_ADDR)[i] = *byte;
         }
         proc_start(TEST_CODE_ADDR as u64, USER_STACK_TOP);
     }

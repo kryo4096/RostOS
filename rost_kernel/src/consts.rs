@@ -19,3 +19,6 @@ pub const VGA_BUFFER_PADDR: u64 = 0xb8000;
 pub const USER_START: u64 = 0x0; // userspace
 pub const USER_STACK_TOP: u64 = 0x7F_FFFF_FFFF; // |   text   |  heap | ... | stack |
 pub const USER_STACK_SIZE: u64 = 0x100_0000;
+
+pub const KB_DATA_PORT: u16 = 0x60;
+pub const KB_STATUS_PORT: u16 = 0x64;

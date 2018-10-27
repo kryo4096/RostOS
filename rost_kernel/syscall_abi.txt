@@ -1,12 +1,64 @@
-args in order:
-rdi, rsi, rdx, rcx, r8, r9
-
-to syscall int 80h
-
-rdi syscall number
 
 
-0 - println
+0x0 - print
+DESC
+    prints an ASCII message to the VGA console
+
 ARGS
-    rdi = message pointer
-    rsi = character count
+    rsi = message pointer (u64)
+    rdx = character count (u64)
+
+RETURNS
+    (none)
+
+
+----
+
+0x1 - println
+DESC
+    prints an ASCII message + '\n' to the VGA console
+
+ARGS
+    rsi = message pointer (u64)
+    rdx = character count (u64)
+
+RETURNS
+    (none)
+
+----
+
+0x2 - debug_num
+DESC
+    prints a number to the VGA console in hexadecimal
+
+ARGS
+    rsi = number to print (u64)
+
+RETURNS
+    (none)
+
+----
+
+0x10 - time (unimplemented)
+DESC
+    returns the number of ticks passed since kernel startup
+ARGS
+    (none)
+
+RETURNS
+    rax = ticks (u64)
+
+----
+
+
+0x20 - umx (User Memory eXtend) 
+DESC
+    extends user memory by the specified amount of pages
+
+ARGS
+    rsi = amount of pages to add (u64)
+
+RETURNS
+    eax = new memory end address
+
+

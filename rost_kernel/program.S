@@ -1,20 +1,13 @@
 bits 64
 
+mov rsi, data
+mov rdx, 14
+mov rdi, 0h
+int 80h
+
 spin:
-    call time
-    mov rsi, rax
-    call print
 jmp spin
 
-print:
-mov rdi, 2
-int 80h
-ret
-
-time:
-mov rdi, 10
-int 80h
-ret
 
 data:
 db 'Hello, Kernel!'

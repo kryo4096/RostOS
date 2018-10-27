@@ -17,9 +17,7 @@ proc_start:
     mov rsp, rsi
     ret
 
-.global _syscall_handler
-_syscall_handler:
-    spin:
-    jmp spin
-    call __syscall
-
+.global __syscall
+__syscall:
+    int3
+    sysret

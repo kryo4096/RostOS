@@ -98,4 +98,4 @@ impl VGABuffer {
 }
 
 /// The VGA buffer at 0xb8000
-pub static VGA_BUFFER: VGABuffer = VGABuffer::new(VGA_BUFFER_VADDR, 80, 25;
+pub static VGA_BUFFER: VGABuffer = unsafe { VGABuffer::new(VGA_BUFFER_VADDR, 80, 25) };
