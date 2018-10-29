@@ -1,13 +1,23 @@
 bits 64
 
-mov rsi, data
-mov rdx, 14
-mov rdi, 0h
-int 80h
+xor r15, r15
 
 spin:
-jmp spin
+mov rdi, 10h
+int 80h
+mov rsi, rax
 
+cmp rax, r15
+
+jl spin
+
+add r15, 10h
+mov rdi, 2h
+int 80h
+
+jmp spin
 
 data:
 db 'Hello, Kernel!'
+
+heap_start:

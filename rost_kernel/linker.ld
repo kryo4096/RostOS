@@ -4,7 +4,7 @@ SECTIONS
 {
   . = 0xFFFF800000000000;
   .text : { *(.text) }
-  . = 0xFFFF800001000000;
+  . = ALIGN(0x1000);
   .rodata : { *(.rodata) }
   . = ALIGN(0x1000);
   .eh_frame : { *(.eh_frame) }

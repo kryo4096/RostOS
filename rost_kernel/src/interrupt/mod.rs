@@ -6,7 +6,7 @@ use x86_64::instructions::interrupts;
 pub use self::pic::send_eoi;
 
 use core::mem;
-use x86_64::structures::idt::{ExceptionStackFrame, InterruptDescriptorTable};
+use x86_64::structures::idt::{ExceptionStackFrame, InterruptDescriptorTable, HandlerFunc};
 
 static mut IDT: InterruptDescriptorTable = InterruptDescriptorTable::new();
 
@@ -15,15 +15,15 @@ pub unsafe fn init() {
     IDT.breakpoint.set_handler_fn(handler::breakpoint);
     IDT.page_fault.set_handler_fn(handler::page_fault);
     IDT.general_protection_fault.set_handler_fn(handler::gpf);
-    IDT[0x80].set_handler_fn(handler::syscall);
+    IDT[0x80].set_handler_fn(*(&(handler::syscall_handler as unsafe extern fn()) as *const unsafe extern fn() as u64 as *const HandlerFunc));
     IDT[0x20].set_handler_fn(handler::clock);
     IDT[0x21].set_handler_fn(handler::keyboard);
 
     IDT.load();
-    
-    pic::unmask(1); // keyboard
 
     pic::init();
+
+    pic::unmask(0); //timer
 
     if !interrupts::are_enabled() {
         interrupts::enable();

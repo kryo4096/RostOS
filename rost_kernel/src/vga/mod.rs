@@ -5,6 +5,8 @@ mod writer;
 pub use self::color::*;
 use self::writer::*;
 
+use x86_64::instructions::interrupts::without_interrupts;
+
 use core::fmt;
 use core::fmt::Write;
 
@@ -15,7 +17,7 @@ pub fn write_str(color: Color, string: &str) {
 }
 
 pub fn write_fmt(args: fmt::Arguments) {
-    WRITER.lock().write_fmt(args);
+    without_interrupts(||WRITER.lock().write_fmt(args));
 }
 
 pub fn set_background(bg_color: Color) {

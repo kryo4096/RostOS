@@ -17,7 +17,7 @@ proc_start:
     mov rsp, rsi
     ret
 
-.global __syscall
-__syscall:
-    int3
-    sysret
+.global syscall_handler
+syscall_handler:
+    call __syscall
+    iretq

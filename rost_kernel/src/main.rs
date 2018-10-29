@@ -9,7 +9,8 @@
     alloc,
     alloc_error_handler,
     lang_items,
-    naked_functions
+    naked_functions,
+    const_vec_new,
 )]
 #![allow(unused)]
 
@@ -68,10 +69,6 @@ pub fn io_wait() {
 #[no_mangle]
 pub extern "C" fn kstart() -> ! {
 
-    unsafe {
-        interrupt::init();
-    }
-
     let mut frame_allocator = unsafe { memory::init() };
     let mut p4 = memory::get_p4();
 
@@ -107,9 +104,12 @@ pub extern "C" fn kstart() -> ! {
             .init(KERNEL_HEAP_START as usize, KERNEL_HEAP_SIZE as usize);
     }
 
+
     unsafe {
-        syscall::init();
+        interrupt::init();
     }
+
+
     kmain(frame_allocator);
 }
 
