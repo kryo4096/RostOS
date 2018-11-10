@@ -10,7 +10,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "bootloader"
+<<<<<<< HEAD
 version = "0.3.4"
+=======
+version = "0.3.2"
+>>>>>>> master
 dependencies = [
  "fixedvec 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "usize_conversions 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",

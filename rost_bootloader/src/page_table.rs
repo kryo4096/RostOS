@@ -20,7 +20,7 @@ pub(crate) fn map_kernel(
 
     // create a stack
     // TODO create a stack range dynamically (based on where the kernel is loaded)
-    let stack_start = Page::containing_address(VirtAddr::new(0x57AC_0000_0000));
+    let stack_start = Page::containing_address(VirtAddr::new(0xffff_ff00_0000_0000));
     let stack_size: u64 = 512; // in pages
     let stack_end = stack_start + stack_size;
 
@@ -81,7 +81,7 @@ pub(crate) fn map_segment(
                     // segment. Thus, we need to copy it before zeroing.
 
                     // TODO: search for a free page dynamically
-                    let temp_page: Page = Page::containing_address(VirtAddr::new(0xfeeefeee000));
+                    let temp_page: Page = Page::containing_address(VirtAddr::new(0xffff828000000000));
                     let new_frame = frame_allocator
                         .allocate_frame(MemoryRegionType::Kernel)
                         .ok_or(MapToError::FrameAllocationFailed)?;

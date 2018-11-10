@@ -169,7 +169,7 @@ pub extern "C" fn load_elf(
 
     // Map a page for the boot info structure
     let boot_info_page = {
-        let page: Page = Page::containing_address(VirtAddr::new(0xb0071f0000));
+        let page: Page = Page::containing_address(VirtAddr::new(0xffff820000000000));
         let frame = frame_allocator
             .allocate_frame(MemoryRegionType::BootInfo)
             .expect("frame allocation failed");
@@ -219,7 +219,7 @@ fn enable_write_protect_bit() {
 #[no_mangle]
 pub extern "C" fn panic(info: &PanicInfo) -> ! {
     use core::fmt::Write;
-    write!(printer::Printer, "{}", info).unwrap();
+    write!(::printer::Printer, "{}", info).unwrap();
     loop {}
 }
 
