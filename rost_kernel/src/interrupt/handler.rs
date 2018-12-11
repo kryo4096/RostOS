@@ -15,21 +15,36 @@ pub extern "x86-interrupt" fn page_fault(
     pcode: PageFaultErrorCode,
 ) {
     println!("EXCEPTION: PAGE FAULT\n{:#?}\n{:#?}", frame, pcode);
-    loop {}
+
+
+    loop {
+        unsafe{asm!("hlt")}
+    }
 }
 
 pub extern "x86-interrupt" fn double_fault(frame: &mut ExceptionStackFrame, error_code: u64) {
     println!("EXCEPTION: DOUBLE FAULT\n{:#?} ec: {}", frame, error_code);
-    loop {}
+    loop {
+        unsafe{asm!("hlt")}
+    }
 }
 
 pub extern "x86-interrupt" fn gpf(frame: &mut ExceptionStackFrame, error_code: u64) {
     println!("EXCEPTION: GENERAL PROTECTION FAULT\n{:#?}", frame);
-    loop {}
+    loop {
+        unsafe{asm!("hlt")}
+    }
 }
 
-extern {
-    pub fn syscall_handler(); 
+pub extern "x86-interrupt" fn ui(frame: &mut ExceptionStackFrame) {
+    println!("EXCEPTION: INVALID INSTRUCTION\n{:#?}", frame);
+    loop {
+        unsafe{asm!("hlt")}
+    }
+}
+
+extern "C" {
+    pub fn syscall_handler();
 }
 
 /*
@@ -58,18 +73,24 @@ pub fn syscall() {
     }
 }
 */
-pub extern "x86-interrupt" fn clock(frame: &mut ExceptionStackFrame) {
-    ::time::tick();
+
+use x86_64::VirtAddr;
+
+use ::process::Registers;
+
+pub extern "x86-interrupt" fn tick(frame: &mut ExceptionStackFrame) {        
     unsafe {
         ::interrupt::send_eoi(0);
+        ::time::tick();
     }
+
 }
 
 pub extern "x86-interrupt" fn keyboard(frame: &mut ExceptionStackFrame) {
     let port = Port::new(KB_DATA_PORT);
     unsafe {
         let scancode: u8 = port.read();
+        keyboard::push_scancode(scancode);
         ::interrupt::send_eoi(1);
-        println!("{}d", scancode);
     }
 }

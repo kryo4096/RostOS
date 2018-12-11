@@ -1,6 +1,10 @@
+HOW TO SYSCALL
+
+mov rdx, {syscall type}
+int 80h
 
 
-0x0 - print
+0h - print
 DESC
     prints an ASCII message to the VGA console
 
@@ -14,7 +18,7 @@ RETURNS
 
 ----
 
-0x1 - println
+1h - println
 DESC
     prints an ASCII message + '\n' to the VGA console
 
@@ -27,19 +31,23 @@ RETURNS
 
 ----
 
-0x2 - debug_num
+2h - debug
 DESC
-    prints a number to the VGA console in hexadecimal
+    prints a number to the VGA console in the specified format
 
 ARGS
     rsi = number to print (u64)
-
+    rdx = format option
+        0x0 binary
+        0x1 octal
+        0x2 decimal
+        0x3 hexadecimal
 RETURNS
     (none)
 
 ----
 
-0x10 - time (unimplemented)
+10h - time 
 DESC
     returns the number of ticks passed since kernel startup
 ARGS
@@ -51,7 +59,7 @@ RETURNS
 ----
 
 
-0x20 - umx (User Memory eXtend) 
+20h - umx (User Memory eXtend) 
 DESC
     extends user memory by the specified amount of pages
 
@@ -59,6 +67,6 @@ ARGS
     rsi = amount of pages to add (u64)
 
 RETURNS
-    eax = new memory end address
+    rax = new memory end address
 
 

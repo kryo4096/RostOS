@@ -4,15 +4,23 @@ version = "0.1.0"
 authors = ["kryo4096 <kryo4096@gmail.com>"]
 
 [dependencies]
-spin = "0.4"
+spin = "*"
 bootloader = {path = "../bootloader"}
-x86_64 = "0.2"
+rust_fs = {path = "../rust_fs"}
+x86_64 = "0.3"
 bitflags = "1.0"
 linked_list_allocator = "0.6"
+xmas-elf = "0.6.2"
+volatile = "0.2.3"
+
 
 [dependencies.lazy_static]
 features=["spin_no_std"]
 version="1.1"
+
+[dependencies.rand]
+default-features = false
+version = "0.6"
 
 [package.metadata.bootimage]
 default-target = "x86_64-rust_kernel.json"

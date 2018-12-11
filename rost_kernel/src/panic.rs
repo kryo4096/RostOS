@@ -1,4 +1,4 @@
-use vga;
+use vga_buffer;
 
 use core::panic::PanicInfo;
 use core::alloc::Layout;
@@ -9,12 +9,12 @@ use core::alloc::Layout;
 pub fn panic(
     panic_info: &PanicInfo,
 ) -> ! {
+    println!("panic at: {:#?}",panic_info.location().unwrap());
 
-    println!("panic at: {:?}",panic_info.location().unwrap());
-
-
-
-
+    if let Some(msg) = panic_info.message() {
+        println!("{}", msg);
+    }
+    
     loop {}
 }
 
@@ -22,5 +22,3 @@ pub fn panic(
 pub fn oom(_:Layout) -> ! {
     panic!("Out of Memory!")
 }
-
-#[lang = "eh_personality"] extern fn eh_personality() {}
