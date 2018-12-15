@@ -13,6 +13,8 @@ pub fn panic(
 
     if let Some(msg) = panic_info.message() {
         println!("{}", msg);
+    } else {
+        println!("no message");
     }
     
     loop {}

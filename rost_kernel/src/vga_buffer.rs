@@ -41,6 +41,11 @@ const BUFFER_WIDTH: usize = 80;
 
 use volatile::Volatile;
 
+
+use core::sync::atomic::{AtomicBool, Ordering};
+
+
+
 struct Buffer {
     chars: [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
@@ -52,6 +57,18 @@ pub struct Writer {
 }
 
 impl Writer {
+    pub fn clear(&mut self) {
+        self.column_position = 0;
+        for x in 0..BUFFER_WIDTH {
+            for y in 0..BUFFER_HEIGHT {
+                self.buffer.chars[y][x].write(ScreenChar {
+                    ascii_character: 0,
+                    color_code: ColorCode::new(Color::Black, Color::Black),
+                });
+            }
+        }
+    }
+
     pub fn write_byte(&mut self, byte: u8) {
         match byte {
             b'\n' => self.new_line(),
@@ -67,6 +84,7 @@ impl Writer {
                 self.buffer.chars[row][col].write(ScreenChar {
                     ascii_character: byte,
                     color_code,
+
                 });
                 self.column_position += 1;
             }
@@ -98,7 +116,7 @@ impl Writer {
     fn clear_row(&mut self, row: usize) {
         let blank = ScreenChar {
             ascii_character: b' ',
-            color_code: self.color_code,
+            color_code: ColorCode::new(Color::Black, Color::Black),
         };
         for col in 0..BUFFER_WIDTH {
             self.buffer.chars[row][col].write(blank);
@@ -122,7 +140,7 @@ use ::consts::VGA_BUFFER_VADDR;
 lazy_static! {
     pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {
         column_position: 0,
-        color_code: ColorCode::new(Color::LightGray, Color::Black),
+        color_code: ColorCode::new(Color::Yellow, Color::Black),
         buffer: unsafe { &mut *(VGA_BUFFER_VADDR as *mut Buffer) },
     });
 }
@@ -131,7 +149,10 @@ lazy_static! {
 pub fn _print(args: fmt::Arguments) {
     use core::fmt::Write;
     without_interrupts(||{
-        WRITER.lock().write_fmt(args).unwrap();
+        unsafe {
+            WRITER.force_unlock();
+            WRITER.lock().write_fmt(args).unwrap();
+        }
     });
 }
 
@@ -144,4 +165,25 @@ macro_rules! println {
 #[macro_export]
 macro_rules! print {
     ($($arg:tt)*) => ($crate::vga_buffer::_print(format_args!($($arg)*)));
+}
+
+use consts::*;
+use x86_64::structures::paging::PageTableFlags;
+
+static VGA_USER_MAPPED: AtomicBool = AtomicBool::new(false); 
+
+pub fn map_for_user() -> Result<(),()> {
+    if !VGA_USER_MAPPED.compare_and_swap(false, true, Ordering::SeqCst) {
+        //WRITER.lock().clear();
+        ::memory::map_to_address(USER_VGA, VGA_BUFFER_PADDR, PageTableFlags::PRESENT | PageTableFlags::WRITABLE);
+        Ok(())
+    } else {
+        println!("failed to map VGA to process {}", ::process::current_pid());
+        Err(())
+    }
+}
+
+pub fn unmap_for_user(){
+    ::memory::unmap(USER_VGA);
+    VGA_USER_MAPPED.store(false, Ordering::SeqCst);
 }

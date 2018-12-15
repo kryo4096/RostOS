@@ -79,7 +79,7 @@ pub extern "C" fn kernel_init() {
     unsafe {
         // initialize memory management
         memory::init();
-
+        
         // map vga buffer to high memory
         memory::map_to_address(
             VGA_BUFFER_VADDR,
@@ -101,25 +101,28 @@ pub extern "C" fn kernel_init() {
             .lock()
             .init(KERNEL_HEAP_START as usize, KERNEL_HEAP_SIZE as usize);
 
+        time::set_interval(20000);
         gdt::init();
         // intialize interrupts (IDT, PIC)
         interrupt::init();
         fs::init();
+        syscall::init();
+        process::init();
+
+
     }
 }
+
+use process::Process;
 
 #[no_mangle]
 pub extern "C" fn kernel_main() -> ! {
     unsafe {
-        //let mut buf = Vec::new();jok
-        //let file = fs::open(&mut *fs::tree_mut(),"bin/init",0);
-        //fs::read_file(&mut *fs::tree_mut(), file, &mut buf);
+        process::enqueue_process(Process::create(b"bin/pong"));
 
-        let pid = process::create_process();
+        process::enable_switching();
 
-        process::load_elf_to_process(pid, b"bin/init");
-        process::start_process(pid);
-
+        process::exit();
     }
 }
 

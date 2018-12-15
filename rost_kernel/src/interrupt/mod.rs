@@ -17,9 +17,18 @@ pub unsafe fn init() {
     IDT.page_fault.set_handler_fn(handler::page_fault);
     IDT.general_protection_fault.set_handler_fn(handler::gpf);
     IDT.invalid_opcode.set_handler_fn(handler::ui);
+    IDT.invalid_tss.set_handler_fn(handler::invalid_tss);
+    IDT.stack_segment_fault.set_handler_fn(handler::stack_segment_fault);
+    IDT.security_exception.set_handler_fn(handler::security_exception);
+    IDT.segment_not_present.set_handler_fn(handler::segment_not_present);
+    IDT.overflow.set_handler_fn(handler::overflow);
+    IDT.non_maskable_interrupt.set_handler_fn(handler::nmi);
+    IDT.bound_range_exceeded.set_handler_fn(handler::bound_range_exceeded);
+    IDT.divide_by_zero.set_handler_fn(handler::divide_by_zero);
     IDT[0x80].set_handler_fn(*(&(handler::syscall_handler as unsafe extern fn()) as *const unsafe extern fn() as u64 as *const HandlerFunc));
     IDT[0x20].set_handler_fn(handler::tick);
     IDT[0x21].set_handler_fn(handler::keyboard);
+
 
     IDT.load();
 

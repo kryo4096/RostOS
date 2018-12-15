@@ -7,6 +7,20 @@
         {
             "type": "lldb",
             "request": "launch",
+            "name": "Qemu",
+            "program": "${workspaceFolder}/target/debug/x86_64-rust_kernel/bootimage.bin",
+            "custom": [
+                {
+                    "text": "target remote localhost:1234",
+                    "description": "Connect to QEMU remote debugger"
+                }
+            ],
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
             "name": "Debug executable 'rust_kernel'",
             "cargo": {
                 "args": [

@@ -13,8 +13,6 @@ use crate::memory;
 
 pub struct LoadInfo {
     pub entry_point: u64,
-    pub image_start: u64,
-    pub image_end: u64,
 }
 
 pub unsafe fn load_elf(_elf: &[u8]) -> Result<LoadInfo, &'static str> {
@@ -35,7 +33,7 @@ pub unsafe fn load_elf(_elf: &[u8]) -> Result<LoadInfo, &'static str> {
     let image_start = segments.iter().map(|s|s.virtual_addr).min().ok_or("invalid elf")?;
     let image_end = segments.iter().map(|s|s.virtual_addr + s.mem_size).max().ok_or("invalid elf")?;
 
-    memory::map_range(image_start, image_end, PageTableFlags::PRESENT | PageTableFlags::WRITABLE);
+    memory::map_range(image_start, image_end, PageTableFlags::PRESENT | PageTableFlags::WRITABLE );
 
     for segment in segments {
         let vaddr = segment.virtual_addr;
@@ -47,7 +45,5 @@ pub unsafe fn load_elf(_elf: &[u8]) -> Result<LoadInfo, &'static str> {
 
     Ok(LoadInfo {
         entry_point,
-        image_start,
-        image_end,
     })
 }

@@ -43,6 +43,63 @@ pub extern "x86-interrupt" fn ui(frame: &mut ExceptionStackFrame) {
     }
 }
 
+pub extern "x86-interrupt" fn invalid_tss(frame: &mut ExceptionStackFrame, error_code: u64) {
+    println!("EXCEPTION: INVALID TSS\n{:#?}", frame);
+    loop {
+        unsafe{asm!("hlt")}
+    }
+}
+
+pub extern "x86-interrupt" fn stack_segment_fault(frame: &mut ExceptionStackFrame, error_code: u64) {
+    println!("EXCEPTION: #SS\n{:#?}", frame);
+    loop {
+        unsafe{asm!("hlt")}
+    }
+}
+
+pub extern "x86-interrupt" fn security_exception(frame: &mut ExceptionStackFrame, error_code: u64) {
+    println!("EXCEPTION: SECURITY EXEPTION\n{:#?}", frame);
+    loop {
+        unsafe{asm!("hlt")}
+    }
+}
+
+pub extern "x86-interrupt" fn segment_not_present(frame: &mut ExceptionStackFrame, error_code: u64) {
+    println!("EXCEPTION: SEGMENT NOT PRESENT\n{:#?}", frame);
+    loop {
+        unsafe{asm!("hlt")}
+    }
+}
+
+pub extern "x86-interrupt" fn overflow(frame: &mut ExceptionStackFrame) {
+    println!("EXCEPTION: OVERFLOW\n{:#?}", frame);
+    loop {
+        unsafe{asm!("hlt")}
+    }
+}
+
+pub extern "x86-interrupt" fn nmi(frame: &mut ExceptionStackFrame) {
+    println!("NMI occured!\n{:#?}", frame);
+}
+
+pub extern "x86-interrupt" fn divide_by_zero(frame: &mut ExceptionStackFrame) {
+    println!("EXCEPTION: Division by Zero\n{:#?}", frame);
+    loop {}
+}
+
+pub extern "x86-interrupt" fn debug(frame: &mut ExceptionStackFrame) {
+    println!("DEBUG EXCEPTION\n{:#?}", frame);
+    loop {}
+}
+
+pub extern "x86-interrupt" fn bound_range_exceeded(frame: &mut ExceptionStackFrame) {
+    println!("EXCEPTION: Bound Range Exceeded\n{:#?}", frame);
+    loop {}
+}
+
+
+
+
 extern "C" {
     pub fn syscall_handler();
 }
@@ -80,8 +137,9 @@ use ::process::Registers;
 
 pub extern "x86-interrupt" fn tick(frame: &mut ExceptionStackFrame) {        
     unsafe {
-        ::interrupt::send_eoi(0);
         ::time::tick();
+        ::interrupt::send_eoi(0);
+        ::process::update();
     }
 
 }
@@ -90,7 +148,7 @@ pub extern "x86-interrupt" fn keyboard(frame: &mut ExceptionStackFrame) {
     let port = Port::new(KB_DATA_PORT);
     unsafe {
         let scancode: u8 = port.read();
-        keyboard::push_scancode(scancode);
+        ::keyboard::push_scancode(scancode);
         ::interrupt::send_eoi(1);
     }
 }
