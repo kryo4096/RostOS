@@ -96,12 +96,12 @@ pub extern "C" fn kernel_init() {
             PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
         );
 
-        // initalize heap allocator
+        // initalize heap allocator11
         ALLOCATOR
             .lock()
             .init(KERNEL_HEAP_START as usize, KERNEL_HEAP_SIZE as usize);
 
-        time::set_interval(20000);
+        time::set_interval(5000);
         gdt::init();
         // intialize interrupts (IDT, PIC)
         interrupt::init();
@@ -118,11 +118,12 @@ use process::Process;
 #[no_mangle]
 pub extern "C" fn kernel_main() -> ! {
     unsafe {
-        process::enqueue_process(Process::create(b"bin/pong"));
-
-        process::enable_switching();
-
+        println!("{:x}", USER_KERNEL_STACK_PTR);
+        process::schedule(Process::create(b"bin/init"));
+        process::activate_scheduler();
         process::exit();
+
+
     }
 }
 

@@ -12,7 +12,7 @@ void _start() {
     int64_t x = VGA_WIDTH / 2, y = VGA_HEIGHT / 2;
 
     // ball velocity
-    int64_t u = 1, v = 1;
+    int64_t u = 2, v = 1;
     
     // paddle positions
     int64_t paddle_left = VGA_HEIGHT / 2, paddle_right = VGA_HEIGHT / 2;
@@ -83,7 +83,7 @@ void _start() {
                     v *= -1;
                 }
 
-                if(x == 0) {
+                if(x <= 0 || x > 1000) {
                     if(y - paddle_left <= 1 && y - paddle_left >= -1) {
                         u *= -1;
                     } else {
@@ -94,10 +94,14 @@ void _start() {
                                                 }
                         score_right++;
                         u *=-1 ;
+
+                        if(paddle_right_v) {
+                            v = paddle_right_v;
+                        }
                     }
                 }
 
-                if(x == VGA_WIDTH - 1) {
+                if(x >= VGA_WIDTH - 1) {
                     if(y - paddle_right <= 1 && y - paddle_right >= -1) {
                         u *= -1;
                     } else {
@@ -111,6 +115,10 @@ void _start() {
 
 
                         u *= -1;
+
+                        if(paddle_left_v) {
+                             v = paddle_left_v;
+                        }
                     }
                 }
 

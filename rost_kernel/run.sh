@@ -7,14 +7,14 @@ done
 
 fscreate disk.img 1024 root
 
-bootimage run
+bootimage run -- -enable-kvm -machine q35,accel=kvm -device intel-iommu \
+    -cpu host -d int -m 2G -monitor stdio
+
 
 #bootimage build
-#objdump -d target/x86_64-rust_kernel/debug/rust_kernel -M intel > kernel.dmp
+objdump -d target/x86_64-rust_kernel/debug/rust_kernel -M intel > kernel.dmp
 
 
 #qemu-system-x86_64 target/x86_64-rust_kernel/debug/bootimage-rust_kernel.bin \
-    -enable-kvm -machine q35,accel=kvm -device intel-iommu \
-    -cpu host -d int -m 2G -monitor stdio
 
 

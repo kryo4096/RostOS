@@ -27,7 +27,8 @@ syscall_handler:
     push r14
     push r15
     mov r15, rsp
-    mov rsp, 0xffff82ffffffffff
+    mov r14, 0x658000000000
+    mov rsp, QWORD PTR [r14]
     push r15
     call __syscall
     pop r15

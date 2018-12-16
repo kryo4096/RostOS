@@ -13,8 +13,6 @@ pub unsafe fn init() {
 
     LSTAR.write(syscall_handler as *const fn() as _);
     SFMASK.write(0x200);
-
-    memory::map_range(KERNEL_SYSCALL_STACK - KERNEL_SYSCALL_SIZE, KERNEL_SYSCALL_STACK, PageTableFlags::PRESENT | PageTableFlags::WRITABLE);
 }
 
 #[no_mangle]
@@ -78,7 +76,7 @@ unsafe fn execute(path_ptr: u64, path_len: u64) -> u64 {
 
     let pid = ::process::Process::create(&vec);
 
-    ::process::enqueue_process(pid);
+    ::process::schedule(pid);
 
     pid
 }

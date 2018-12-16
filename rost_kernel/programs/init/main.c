@@ -6,8 +6,8 @@ void _start() {
     println("Init started!");
 
     uint64_t pid = execute("/bin/pong");
-    //wait_pid(pid);
+    wait_pid(pid);
+    println("Pong exited!");
 
-    //println("Pong exited!");
     proc_exit();
 }

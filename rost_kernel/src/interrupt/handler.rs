@@ -23,7 +23,7 @@ pub extern "x86-interrupt" fn page_fault(
 }
 
 pub extern "x86-interrupt" fn double_fault(frame: &mut ExceptionStackFrame, error_code: u64) {
-    println!("EXCEPTION: DOUBLE FAULT\n{:#?} ec: {}", frame, error_code);
+    println!("EXCEPTION: DOUBLE FAULT\n{:#?} ec: 0x{:x}", frame, error_code);
     loop {
         unsafe{asm!("hlt")}
     }
@@ -96,8 +96,6 @@ pub extern "x86-interrupt" fn bound_range_exceeded(frame: &mut ExceptionStackFra
     println!("EXCEPTION: Bound Range Exceeded\n{:#?}", frame);
     loop {}
 }
-
-
 
 
 extern "C" {

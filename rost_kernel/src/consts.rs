@@ -23,13 +23,14 @@ pub static RAMDISK_SIZE: u64 = ::DISK_IMAGE.len() as u64;
 
 pub const PT_START: u64 = KERNEL_START + 4 * P4_ENTRY_SIZE;
 
-pub const KERNEL_SYSCALL_STACK: u64 = KERNEL_START + 6*P4_ENTRY_SIZE - 1;// 0xffff_82ff_ffff_fffe
-pub const KERNEL_SYSCALL_SIZE: u64 = 0x100_0000;
+pub const KERNEL_SYSCALL_STACK_START: u64 = KERNEL_START + 128*P4_ENTRY_SIZE;// 0xffff_82ff_ffff_fffe
+pub const KERNEL_SYSCALL_STACK_SIZE: u64 = 0x100000;
 
 pub const USER_STACK_TOP: u64 = P4_ENTRY_SIZE - 1;
 pub const USER_STACK_SIZE: u64 = 0x100_0000;
 
-pub const USER_VGA: u64 = 2*P4_ENTRY_SIZE;
+pub const USER_VGA: u64 = 200*P4_ENTRY_SIZE;
+pub const USER_KERNEL_STACK_PTR: u64 =  203*P4_ENTRY_SIZE; // 0x18000000000
 
 pub const KB_DATA_PORT: u16 = 0x60;
 pub const KB_STATUS_PORT: u16 = 0x64;
