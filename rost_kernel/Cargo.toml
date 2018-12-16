@@ -1,5 +1,5 @@
 [package]
-name = "rust_kernel"
+name = "rost_kernel"
 version = "0.1.0"
 authors = ["kryo4096 <kryo4096@gmail.com>"]
 
