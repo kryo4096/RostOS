@@ -1,0 +1,9 @@
+[submodule "rost_kernel"]
+	path = rost_kernel
+	url = https://github.com/kryo4096/rost_kernel
+[submodule "rost_fs"]
+	path = rost_fs
+	url = https://github.com/kryo4096/rost_fs
+[submodule "rost_bootloader"]
+	path = rost_bootloader
+	url = https://github.com/kryo4096/rost_bootloader
