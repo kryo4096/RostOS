@@ -1,0 +1,10 @@
+[package]
+name = "fscreate"
+version = "0.1.0"
+authors = ["kryo4096 <kryo4096@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+rand = "*"
+rost_fs = {path = "../" }
+walkdir = "2"

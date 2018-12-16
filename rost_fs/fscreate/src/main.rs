@@ -12,7 +12,7 @@ use std::io::{self, Read, Write};
 use std::ops::Deref;
 use std::path::PathBuf;
 
-use rost_fs::walkdir::WalkDir;
+use walkdir::WalkDir;
 
 pub struct FileDisk {
     block_count: usize,
