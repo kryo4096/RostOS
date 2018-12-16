@@ -23,7 +23,7 @@ extern crate bootloader;
 extern crate linked_list_allocator;
 extern crate spin;
 extern crate x86_64;
-extern crate rust_fs;
+extern crate rost_fs;
 extern crate xmas_elf;
 extern crate volatile;
 
@@ -118,10 +118,12 @@ use process::Process;
 #[no_mangle]
 pub extern "C" fn kernel_main() -> ! {
     unsafe {
-        println!("{:x}", USER_KERNEL_STACK_PTR);
+
+
         process::schedule(Process::create(b"bin/init"));
         process::activate_scheduler();
-        process::exit();
+        
+        loop {}
 
 
     }

@@ -95,8 +95,9 @@ pub fn map_to_address(virt: u64, phys: u64, flags: PageTableFlags) -> Result<(),
 
 pub fn map(virt: u64, flags: PageTableFlags) -> Result<u64, MapToError> {
     let page = Page::<Size4KiB>::containing_address(VirtAddr::new(virt));
-    let frame = frame_allocator().alloc().expect("no more memory");
+    println!("mapping 0x{:x}", page.start_address().as_u64());
 
+    let frame = frame_allocator().alloc().expect("no more memory");
     p4().map_to(page, frame, flags, &mut *frame_allocator())?
         .flush();
 
@@ -112,6 +113,8 @@ pub fn unmap(virt: u64) {
 pub fn map_range(start_addr: u64, end_addr: u64, flags: PageTableFlags) -> Result<(), MapToError> {
     let start_page = Page::<Size4KiB>::containing_address(VirtAddr::new(start_addr));
     let end_page = Page::<Size4KiB>::containing_address(VirtAddr::new(end_addr));
+
+    println!("mapping from 0x{:x} to 0x{:x}", start_page.start_address().as_u64(), end_page.start_address().as_u64());
 
     for page in Page::range_inclusive(start_page, end_page) {
         let frame = frame_allocator().alloc().expect("no more memory");

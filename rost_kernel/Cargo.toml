@@ -5,8 +5,8 @@ authors = ["kryo4096 <kryo4096@gmail.com>"]
 
 [dependencies]
 spin = "*"
-bootloader = {path = "../bootloader"}
-rust_fs = {path = "../rust_fs"}
+bootloader = {path = "../rost_bootloader"}
+rost_fs = {path = "../rost_fs"}
 x86_64 = "0.3"
 bitflags = "1.0"
 linked_list_allocator = "0.6"

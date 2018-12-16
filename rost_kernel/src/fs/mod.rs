@@ -6,10 +6,10 @@ use spin::{Once, RwLock, RwLockReadGuard, RwLockWriteGuard};
 use alloc::string::String;
 use alloc::vec::Vec;
 use x86_64::structures::paging::PageTableFlags;
-use rust_fs::disk::*;
-use rust_fs::node::*;
+use rost_fs::disk::*;
+use rost_fs::node::*;
 
-pub use rust_fs::fs::*;
+pub use rost_fs::fs::*;
 
 pub mod memory_view;
 
