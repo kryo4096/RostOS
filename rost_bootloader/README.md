@@ -1,4 +1,8 @@
-# rustboot
+# RostOS bootloader
+
+Slight modification of Phil Opp's rustboot to load the Kernel to the higher half of memory.
+
+# rustboot (original readme)
 
 [![Join the chat at https://gitter.im/rust-osdev/bootloader](https://badges.gitter.im/rust-osdev/bootloader.svg)](https://gitter.im/rust-osdev/bootloader?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
