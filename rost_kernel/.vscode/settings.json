@@ -1,0 +1,9 @@
+{
+    "rust.unstable_features": true,
+    "files.associations": {
+        "std.h": "c",
+        "syscall.h": "c",
+        "vga.h": "c"
+    },
+    "C_Cpp.default.includePath": ["libc"],
+}
