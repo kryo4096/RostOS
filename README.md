@@ -15,9 +15,9 @@ To make use of these features, there are system calls which are abstracted a way
 
 *DISCLAIMER: To build RostOS, Linux is recommended. Building on windows or macOS should technically be possible, but has not been tested and no automatic build scripts are provided.* 
 
-A nightly version of the Rust toolchain has to be installed using [rustup](https://rustup.rs/)). Additionally, the `~/.cargo/bin` folder has to be added to `$PATH`. 
+To begin, you first need to download the language itself. Because an OS requires certain unstable features, a nightly version of the Rust toolchain has to be installed. This can be done using [rustup](https://rustup.rs/), the official rust toolchain installation program. You also have to add the `.cargo/bin` directory to `$PATH` so you can use the buildtools installed later.
 
-Additionally the `qemu-system-x86_64` binary has to be present in `$PATH?, which can be downloaded from [www.qemu.org](https://www.gemu.org) or preferably installed with your distribution's package manager.
+If you want to run the OS you need some sort of virtual machine. To use the automatic build scripts, the `qemu-system-x86_64` binary has to be present in `$PATH?, which can be downloaded from [www.qemu.org](https://www.gemu.org) or preferably installed with your distribution's package manager.
 
 When these prerequisites are met, you can run `build_tools.sh` inside the `RostOS` directory, which will install the required build tools using `cargo install` and `rustup`. These are:
 
