@@ -1,8 +1,9 @@
 use core::sync::atomic::AtomicBool;
 use core::sync::atomic::Ordering;
 use core::ptr;
+
 #[macro_use]
-use crate::syscall::{self,*};
+use crate::syscall::*;
 
 const VGA_WIDTH: usize = 80;
 const VGA_HEIGHT: usize = 25;
@@ -45,9 +46,9 @@ impl ColorCode {
     }
 }
 
-impl Into<u8> for ColorCode {
-    fn into(self) -> u8 {
-        self.bg as _ | self.fg as _ << 4
+impl Into<u16> for ColorCode {
+    fn into(self) -> u16 {
+        self.bg as u8 as u16 | ((self.fg as u8 as u16) << 4)
     }
 }
 
@@ -57,7 +58,7 @@ impl VGA {
     pub fn try_get() -> Option<Self> {
         if !VGA_LOCK.compare_and_swap(false, true, Ordering::SeqCst) {
             unsafe {
-                VGA_ADDRESS = syscall!(SYS_MAP_VGA);
+                VGA_ADDRESS = syscall!(SYS_MAP_VGA) as _;
             }
             Some(Self)
         } else {
@@ -71,7 +72,7 @@ impl VGA {
         }
 
         unsafe {
-            VGA_BUFFER[VGA_WIDTH * y + x] = ((color_code as u16) << 8) | chr as u16 & 0x00ff;
+            VGA_BUFFER[VGA_WIDTH * y + x] = ((Into::<u16>::into(color_code)) << 8) | chr as u16 & 0x00ff;
         }
     }
 
@@ -92,7 +93,9 @@ impl VGA {
 
 impl Drop for VGA {
     fn drop(&mut self) {
-        syscall!(SYS_UNMAP_VGA);
+        unsafe {
+            syscall!(SYS_UNMAP_VGA);
+        }
         VGA_LOCK.store(false, Ordering::SeqCst);
     }
 }
