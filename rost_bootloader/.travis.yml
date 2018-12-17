@@ -1,0 +1,27 @@
+language: rust
+
+rust:
+- nightly
+
+os: linux
+
+cache:
+  directories:
+    - $HOME/.cargo
+    - $HOME/.xargo
+    - $TRAVIS_BUILD_DIR/target
+
+before_script:
+- rustup component add rust-src
+- "(test -x $HOME/.cargo/bin/xargo || cargo install xargo)"
+
+sudo: false
+
+notifications:
+  email:
+    on_success: never
+    on_failure: change
+
+script:
+- RUST_TARGET_PATH=`pwd` xargo build --target x86_64-bootloader --release
+- objcopy -O binary -S target/x86_64-bootloader/release/bootloader bootimage.bin

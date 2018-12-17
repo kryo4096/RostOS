@@ -1,0 +1,24 @@
+cargo-features = ["publish-lockfile"]
+
+[package]
+name = "rost_bootloader"
+version = "0.3.4"
+authors = ["Philipp Oppermann <dev@phil-opp.com>"]
+license = "MIT/Apache-2.0"
+description = "An experimental pure-Rust x86 bootloader."
+repository = "https://github.com/rust-osdev/bootloader"
+publish-lockfile = true
+
+[dependencies]
+xmas-elf = "0.6.2"
+x86_64 = "0.2.7"
+usize_conversions = "0.2.0"
+fixedvec = "0.2.3"
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+lto = false
+debug = true
