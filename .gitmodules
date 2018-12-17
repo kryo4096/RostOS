@@ -1,3 +1,0 @@
-[submodule "rost_std"]
-	path = rost_std
-	url = https://github.com/kryo4096/rost_std
