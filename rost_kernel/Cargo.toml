@@ -13,7 +13,6 @@ linked_list_allocator = "0.6"
 xmas-elf = "0.6.2"
 volatile = "0.2.3"
 
-
 [dependencies.lazy_static]
 features=["spin_no_std"]
 version="1.1"
