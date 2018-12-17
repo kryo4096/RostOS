@@ -16,6 +16,6 @@ fscreate rost_kernel/disk.img 1024 ramdisk
 cd rost_kernel
 
 # USE THIS FOR SOFTWARE EMULATION
-bootimage run -- -enable-kvm -m 2G
+bootimage run -- -m 2G
 
 
