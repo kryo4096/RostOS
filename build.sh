@@ -15,7 +15,17 @@ fscreate rost_kernel/disk.img 1024 ramdisk
 
 cd rost_kernel
 
-# USE THIS FOR SOFTWARE EMULATION
-bootimage run -- -enable-kvm -m 2G
+bootimage build
+
+mkdir ../bin
+rm ../bin/*.bin
+cp target/x86_64-rust_kernel/debug/bootimage-rost_kernel.bin ../bin/RostOS.bin
+
+
+#bootimage build
+objdump -d target/x86_64-rust_kernel/debug/rost_kernel -M intel > kernel.dmp
+
+
+#qemu-system-x86_64 target/x86_64-rust_kernel/debug/bootimage-rust_kernel.bin \
 
 

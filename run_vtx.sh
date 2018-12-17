@@ -15,7 +15,7 @@ fscreate rost_kernel/disk.img 1024 ramdisk
 
 cd rost_kernel
 
-# USE THIS FOR SOFTWARE EMULATION
-bootimage run -- -enable-kvm -m 2G
+bootimage run -- -enable-kvm -machine q35,accel=kvm -device intel-iommu \
+    -cpu host -m 2G
 
 

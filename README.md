@@ -13,7 +13,7 @@ To make use of these features, there are system calls which are abstracted a way
 
 ## Installation and Testing
 
-*DISCLAIMER: To build RostOS Linux is recommended. Building on windows or macOS should technically be possible, but has not been tested and no automatic build scripts are provided.* 
+*DISCLAIMER: To build RostOS, Linux is recommended. Building on windows or macOS should technically be possible, but has not been tested and no automatic build scripts are provided.* 
 
 A nightly version of the Rust toolchain has to be installed using [rustup](https://rustup.rs/)). Additionally, the `~/.cargo/bin` folder has to be added to `$PATH`. 
 
@@ -26,7 +26,9 @@ When these prerequisites are met, you can run `build_tools.sh` inside the `RostO
 * `cargo xbuild` to cross-compile to custom targets
 
 The script will also install some dependencies with rustup and set the default toolchain for the `RostOS` folder to nightly. 
-Once the script is done, you can use `run.sh` to compile and run the OS.
+Once the install script is done, you can compile and run the kernel. Use `run_vtx.sh` if you have intel virtualization (VT-x) and otherwise `run.sh` for software emulation. 
+
+To build a bootable image, use `build.sh`, which will create a binary at `bin/RostOS.bin`. 
 
 
 
