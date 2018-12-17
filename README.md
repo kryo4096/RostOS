@@ -26,9 +26,11 @@ When these prerequisites are met, you can run `install_tools.sh` inside the `Ros
 * `cargo xbuild` to cross-compile to custom targets
 
 The script will also install some dependencies with rustup and set the default toolchain for the `RostOS` folder to nightly. 
-Once the install script is done, you can compile and run the kernel. Use `run_vtx.sh` if you have intel virtualization (VT-x) and otherwise `run.sh` for software emulation. 
+Once the install script is done, you can compile and run the kernel. Use `run_vtx.sh` if you have intel virtualization (VT-x) and otherwise `run.sh` for software emulation. (If happen to be trapped in qemu now, press ctrl+alt+g.)
 
 To build a bootable image, use `build.sh`, which will create a binary at `bin/RostOS.bin`. 
+
+## 
 
 
 

@@ -16,7 +16,7 @@ pub unsafe fn init() {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn __syscall(rdi: u64, rsi: u64, rdx: u64, _rcx: u64, r8: u64, r9: u64) -> u64 {
+pub unsafe extern "C" fn __syscall(rdi: u64, rsi: u64, rdx: u64, rcx: u64, r8: u64, r9: u64) -> u64 {
     match rdi {
         0x0  => print(rsi, rdx),
         0x1  => println(rsi, rdx),

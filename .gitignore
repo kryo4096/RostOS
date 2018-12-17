@@ -3,3 +3,4 @@ disk.img
 **/target/
 **/*.bin
 **/*.dmp
+**/dump
