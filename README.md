@@ -7,9 +7,9 @@ Right now the Kernel's features include the following:
 * It reads PS/2 keyboard input.
 * It can start userspace applications from elf-files on a ramdisk.
 * The ramdisk has its own format *RostFS* to save files.
-* Multiple processes can be ran at the same time using a simple scheduler.
+* Multiple processes can be run at the same time using a simple scheduler.
 
-To make use of these features, there are system calls which are abstracted a way in a small library. Some example programs have been written, including a simple console (TODO) and Pong.
+To make use of these features, there are system calls which are abstracted away in a small library. Some example programs have been written, including a simple console (TODO) and Pong.
 
 ## Installation and Testing
 
@@ -17,9 +17,9 @@ To make use of these features, there are system calls which are abstracted a way
 
 To begin, you first need to download the language itself. Because an OS requires certain unstable features, a nightly version of the Rust toolchain has to be installed. This can be done using [rustup](https://rustup.rs/), the official rust toolchain installation program. You also have to add the `.cargo/bin` directory to `$PATH` so you can use the buildtools installed later.
 
-If you want to run the OS you need some sort of virtual machine. To use the automatic build scripts, the `qemu-system-x86_64` binary has to be present in `$PATH?, which can be downloaded from [www.qemu.org](https://www.gemu.org) or preferably installed with your distribution's package manager.
+If you want to run the OS you need some sort of virtual machine. To use the automatic build scripts, the `qemu-system-x86_64` binary has to be present in `$PATH`, which can be downloaded from [www.qemu.org](https://www.qemu.org) or preferably installed with your distribution's package manager.
 
-When these prerequisites are met, you can run `build_tools.sh` inside the `RostOS` directory, which will install the required build tools using `cargo install` and `rustup`. These are:
+When these prerequisites are met, you can run `install_tools.sh` inside the `RostOS` directory, which will install the required build tools using `cargo install` and `rustup`. These are:
 
 * `fscreate` to create a ramdisk image from a template folder.
 * `bootimage` to append the kernel to the bootloader
