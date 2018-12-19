@@ -9,7 +9,7 @@ Right now the Kernel's features include the following:
 * The ramdisk has its own format *RostFS* to save files.
 * Multiple processes can be run at the same time using a simple scheduler.
 
-To make use of these features, there are system calls which are abstracted away in a small library. Some example programs have been written, including a simple console (TODO) and Pong.
+To make use of these features, there are system calls which are abstracted away in a small library. Some example programs have been written, including a simple shell and Pong.
 
 ## Installation and Testing
 
