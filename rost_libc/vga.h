@@ -1,6 +1,7 @@
+#ifndef VGA_H
 #include "std.h"
 #include "syscall.h"
-
+#define VGA_H
 
 const uint64_t VGA_WIDTH;
 const uint64_t VGA_HEIGHT;
@@ -25,13 +26,15 @@ typedef enum Color {
 } Color;
 
 void vga_clear();
-void write_char(uint64_t x, uint64_t y, char ascii_byte, uint8_t color_code);
-uint16_t read_char(uint64_t x, uint64_t y);
-uint8_t create_color_code(Color background, Color foreground);
+void vga_fill(uint8_t color_code);
+void vga_wrchar(uint64_t x, uint64_t y, char ascii_byte, uint8_t color_code);
+uint16_t vga_rdchar(uint64_t x, uint64_t y);
+uint8_t vga_color_code(Color background, Color foreground);
 
-void set_cursor(int x, int y);
+void vga_setcursor(int x, int y, uint16_t color_code);
 
 void vga_init();
 void vga_drop();
 void vga_show();
 
+#endif

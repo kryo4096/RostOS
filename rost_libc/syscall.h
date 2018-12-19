@@ -24,7 +24,7 @@ uint64_t get_pid();
 uint64_t map_vga();
 uint64_t unmap_vga();
 
-void proc_exit();
+void sys_exit();
 uint64_t execute(char* path);
 void wait_pid(uint64_t pid);
 

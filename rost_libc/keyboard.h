@@ -1,6 +1,7 @@
 #ifndef KEYBOARD_H 
 #define KEYBOARD
 #include "std.h"
+#include "syscall.h"
 
 #define KEY_A 0x1E
 #define KEY_B 0x30
@@ -83,8 +84,9 @@
 
 
 typedef enum KeyEventType {
-    KEY_EV_PRESS,
-    KEY_EV_RELEASE,
+    KB_PRESS,
+    KB_RELEASE,
+    KB_NONE,
 } KeyEventType;
 
 typedef struct KeyEvent {
@@ -92,13 +94,17 @@ typedef struct KeyEvent {
     KeyEventType type;
 } KeyEvent;
 
-KeyEvent get_key_event(uint8_t scancode);
+KeyEvent kb_pollevent();
 
 typedef enum KeyCase {
-    CASE_LOWER,
-    CASE_UPPER,
+    KB_CASE_LOWER,
+    KB_CASE_UPPER,
 } KeyCase;
 
-char get_char(KeyEvent event, KeyCase key_case);
+void kb_wait_any();
+
+char kb_getchar(KeyEvent event, KeyCase key_case);
+
+
 
 #endif

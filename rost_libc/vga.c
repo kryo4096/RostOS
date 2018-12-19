@@ -24,7 +24,7 @@ void vga_drop() {
     unmap_vga();
 }
 
-void write_char(uint64_t x, uint64_t y, char ascii_byte, uint8_t color_code) {
+void vga_wrchar(uint64_t x, uint64_t y, char ascii_byte, uint8_t color_code) {
     if(x >= VGA_WIDTH || y >= VGA_HEIGHT) {
         return;
     }
@@ -33,7 +33,7 @@ void write_char(uint64_t x, uint64_t y, char ascii_byte, uint8_t color_code) {
 }
 
 
-uint16_t read_char(uint64_t x, uint64_t y) {
+uint16_t vga_rdchar(uint64_t x, uint64_t y) {
     if(x >= VGA_WIDTH || y >= VGA_HEIGHT) {
         return 0;
     }
@@ -42,7 +42,7 @@ uint16_t read_char(uint64_t x, uint64_t y) {
 }
 
 
-uint8_t create_color_code(Color background, Color foreground) {
+uint8_t vga_color_code(Color background, Color foreground) {
     return (background << 4) | (foreground & 0x0f);
 }
 
@@ -52,18 +52,26 @@ void vga_clear() {
     }
 }
 
+void vga_fill(uint8_t color_code) {   
+    for(volatile size_t offset = 0; offset < VGA_HEIGHT * VGA_WIDTH; offset++) {
+        VGA_BUFFER[offset] = color_code << 8;
+    }
+}
+
 void vga_show() {
     for(size_t offset = 0; offset < VGA_HEIGHT * VGA_WIDTH; offset++) {
         *(VGA_ADDRESS + offset) = VGA_BUFFER[offset];
     }
 }
 
-void set_cursor(int x, int y)
-{
+void vga_setcursor(int x, int y, uint16_t color_code) {
+    
 	uint16_t pos = y * VGA_WIDTH + x;
- 
-	outb(0x3D4, 0x0F);
-	outb(0x3D5, (uint8_t) (pos & 0xFF));
-	outb(0x3D4, 0x0E);
-	outb(0x3D5, (uint8_t) ((pos >> 8) & 0xFF));
+    *(VGA_ADDRESS + pos) |= (color_code << 8) & !0xff;
+
+    
+	pio_outb(0x3D4, 0x0F);
+	pio_outb(0x3D5, (uint8_t) (pos & 0xFF));
+	pio_outb(0x3D4, 0x0E);
+	pio_outb(0x3D5, (uint8_t) ((pos >> 8) & 0xFF));
 }

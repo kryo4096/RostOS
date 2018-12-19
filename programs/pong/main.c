@@ -2,7 +2,12 @@
 #include "syscall.h"
 #include "vga.h"
 #include "keyboard.h"
+#include "process.h"
 
+/*
+    A simple pong game. Player 1 can use W/S to move their paddle up/down and player 2 can use the arrow keys. 
+    The first player to score 10 points wins. To exit, press ESC. 
+*/
 
 void _start() {
 
@@ -31,14 +36,14 @@ void _start() {
     while(1) {
 
         // get a key event
-        KeyEvent event = get_key_event(get_scancode());
+        KeyEvent event = kb_pollevent();
 
         if(event.keycode == KEY_ESCAPE) {
             break;
         }
 
         // W/S control left paddle, UP/DOWN control right_paddle
-        if(event.type == KEY_EV_PRESS) {
+        if(event.type == KB_PRESS) {
             if(event.keycode == KEY_W) {
                 paddle_left_v = -1;
             }
@@ -54,7 +59,7 @@ void _start() {
         }
 
         // handle key releases
-        if(event.type == KEY_EV_RELEASE) {
+        if(event.type == KB_RELEASE) {
             if(event.keycode == KEY_W) {
                 paddle_left_v = 0;
             }
@@ -111,9 +116,6 @@ void _start() {
                             break;
                         }
                         score_left++;
-
-
-
                         u *= -1;
 
                         if(paddle_left_v) {
@@ -131,36 +133,34 @@ void _start() {
         }
 
 
-        const uint8_t BALL_COLOR = create_color_code(C_BLACK, C_WHITE);
-        const uint8_t PADDLE_COLOR = create_color_code(C_BLACK, C_WHITE);
-        const uint8_t TEXT_COLOR = create_color_code(C_BLACK, C_WHITE);
+        const uint8_t BALL_COLOR = vga_color_code(C_BLACK, C_WHITE);
+        const uint8_t PADDLE_COLOR = vga_color_code(C_BLACK, C_WHITE);
+        const uint8_t TEXT_COLOR = vga_color_code(C_BLACK, C_WHITE);
         
         // Clear Buffer
         vga_clear();
 
         // Draw Ball 
-        write_char((uint64_t)x, (uint64_t)y, 254, BALL_COLOR);
+        vga_wrchar((uint64_t)x, (uint64_t)y, 254, BALL_COLOR);
         
         // Draw Left Paddle
-        write_char((uint64_t)0, (uint64_t)paddle_left, 221, PADDLE_COLOR);
-        write_char((uint64_t)0, (uint64_t)paddle_left+1, 221, PADDLE_COLOR);
-        write_char((uint64_t)0, (uint64_t)paddle_left-1, 221, PADDLE_COLOR);
+        vga_wrchar((uint64_t)0, (uint64_t)paddle_left, 221, PADDLE_COLOR);
+        vga_wrchar((uint64_t)0, (uint64_t)paddle_left+1, 221, PADDLE_COLOR);
+        vga_wrchar((uint64_t)0, (uint64_t)paddle_left-1, 221, PADDLE_COLOR);
 
         // Draw Right Paddle
-        write_char((uint64_t)VGA_WIDTH-1, (uint64_t)paddle_right, 222, PADDLE_COLOR);
-        write_char((uint64_t)VGA_WIDTH-1, (uint64_t)paddle_right+1, 222, PADDLE_COLOR);
-        write_char((uint64_t)VGA_WIDTH-1, (uint64_t)paddle_right-1, 222, PADDLE_COLOR);
+        vga_wrchar((uint64_t)VGA_WIDTH-1, (uint64_t)paddle_right, 222, PADDLE_COLOR);
+        vga_wrchar((uint64_t)VGA_WIDTH-1, (uint64_t)paddle_right+1, 222, PADDLE_COLOR);
+        vga_wrchar((uint64_t)VGA_WIDTH-1, (uint64_t)paddle_right-1, 222, PADDLE_COLOR);
 
         // Draw Scores
-        write_char((uint64_t)VGA_WIDTH/2 -5, 2, score_left, TEXT_COLOR);
-        write_char((uint64_t)VGA_WIDTH/2 +5, 2, score_right, TEXT_COLOR);
+        vga_wrchar((uint64_t)VGA_WIDTH/2 -5, 2, score_left, TEXT_COLOR);
+        vga_wrchar((uint64_t)VGA_WIDTH/2 +5, 2, score_right, TEXT_COLOR);
 
         // Flip Buffers
         vga_show();
 
-
     }
 
-    vga_drop();
     proc_exit();
 }

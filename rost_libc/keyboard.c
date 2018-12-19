@@ -1,5 +1,4 @@
 #include "keyboard.h"
-#include "std.h"
 
 const char BACKSPACE = '\b';
 const char ESCAPE = '\e';
@@ -184,26 +183,34 @@ const char KEYMAP_UPPER[] = {
     0,
 };
 
-char get_char(KeyEvent event, KeyCase key_case) {
-    if(event.type != KEY_EV_PRESS) {
+char kb_getchar(KeyEvent event, KeyCase key_case) {
+    if(event.type != KB_PRESS) {
         return 0;
     }
 
     switch(key_case) {
-    case CASE_LOWER: return KEYMAP_LOWER[event.keycode];
-    case CASE_UPPER: return KEYMAP_UPPER[event.keycode];
+    case KB_CASE_LOWER: return KEYMAP_LOWER[event.keycode];
+    case KB_CASE_UPPER: return KEYMAP_UPPER[event.keycode];
     }
 
 }
 
-KeyEvent get_key_event(uint8_t scancode) {
+void kb_wait_any() {
+    while(kb_pollevent().type != KB_PRESS);
+}
+
+KeyEvent kb_pollevent() {
     KeyEvent key_event;
 
-    if(scancode > 0x80) {
-        key_event.type = KEY_EV_RELEASE;
+    uint8_t scancode = get_scancode();
+    if(scancode == 0) {
+        key_event.type = KB_NONE;
+        key_event.keycode = 0; 
+    } else if(scancode > 0x80) {
+        key_event.type = KB_RELEASE;
         key_event.keycode = scancode - 0x80;
     } else {
-        key_event.type = KEY_EV_PRESS;
+        key_event.type = KB_PRESS;
         key_event.keycode = scancode;
     }
 

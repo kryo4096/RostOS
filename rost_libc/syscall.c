@@ -1,5 +1,8 @@
 #include "syscall.h"
 #include "std.h"
+#include "path.h"
+
+// TODO: revamp syscall system, replace functions with one function and syscall number constants
 
 void println(char* str) {
 
@@ -55,12 +58,12 @@ uint64_t get_pid() {
     return pid;
 }
 
-void proc_exit() {
+void sys_exit() {
     asm("mov $0x31, %%rdi" ::: "rdi"); 
     asm("int $0x80" :::"rax");
 }
 
-uint64_t execute(char* path) {
+uint64_t execute(path_t path) {
     uint64_t pid;
     size_t len = strlen(path);
     asm("mov %0, %%rsi" :: "r" (path) : "rsi");

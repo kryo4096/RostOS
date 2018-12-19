@@ -20,7 +20,6 @@ pub unsafe fn load_elf(_elf: &[u8]) -> Result<LoadInfo, &'static str> {
     header::sanity_check(&elf)?;
 
     let entry_point = elf.header.pt2.entry_point();
-    println!("entry_point: 0x{:x}", entry_point);
 
     let segments : Vec<ProgramHeader64> = elf.program_iter().map(|p| match p {
         ProgramHeader::Ph64(header) => {

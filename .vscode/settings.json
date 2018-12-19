@@ -5,6 +5,9 @@
     "files.associations": {
         "keyboard.h": "c",
         "vga.h": "c",
-        "port_io.h": "c"
+        "port_io.h": "c",
+        "process.h": "c",
+        "std.h": "c",
+        "stdbool.h": "c"
     }
 }
