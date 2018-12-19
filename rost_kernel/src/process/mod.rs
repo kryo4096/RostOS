@@ -50,6 +50,7 @@ pub fn process_queue() -> RwLockWriteGuard<'static, ProcessQueue> {
     SCHEDULER.call_once(init_process_state).queue.write()
 }
 
+use fs::path::SEPARATOR;
 
 pub fn init() {
     processes_mut().insert(0, Arc::new(RwLock::new(Process {
@@ -61,6 +62,7 @@ pub fn init() {
         state: State::Running,
         file_descriptors: Default::default(),
         name: "KERNEL".into(),
+        cwd: vec!(SEPARATOR),
     })));
 
 
@@ -141,13 +143,14 @@ pub struct Process {
     pub state: State,
     pub file_descriptors: BTreeMap<u64, NodeDescriptor>,
     pub name: Vec<u8>,
+    pub cwd: Vec<u8>,
 }
 
 
 
 impl Process {
     /// Create a process from an elf file
-    pub unsafe fn create(elf_path: Path) -> u64 {
+    pub unsafe fn create(elf_path: Path, cwd: Vec<u8>) -> u64 {
         let pid = NEXT_PID.fetch_add(1, Ordering::SeqCst);
 
         let mut process = Process {
@@ -159,6 +162,7 @@ impl Process {
             state: State::Runnable,
             file_descriptors: BTreeMap::new(),
             name: path::head(elf_path).into(),
+            cwd: cwd,
         };
 
         let old_table = memory::load_table(process.regs.cr3);

@@ -170,20 +170,11 @@ macro_rules! print {
 use consts::*;
 use x86_64::structures::paging::PageTableFlags;
 
-static VGA_USER_MAPPED: AtomicBool = AtomicBool::new(false); 
-
 pub fn map_for_user() -> Result<(),()> {
-    if !VGA_USER_MAPPED.compare_and_swap(false, true, Ordering::SeqCst) {
-        //WRITER.lock().clear();
-        ::memory::map_to_address(USER_VGA, VGA_BUFFER_PADDR, PageTableFlags::PRESENT | PageTableFlags::WRITABLE);
-        Ok(())
-    } else {
-        println!("failed to map VGA to process {}", ::process::current_pid());
-        Err(())
-    }
+    ::memory::map_to_address(USER_VGA, VGA_BUFFER_PADDR, PageTableFlags::PRESENT | PageTableFlags::WRITABLE);
+    Ok(())
 }
 
 pub fn unmap_for_user(){
     ::memory::unmap(USER_VGA);
-    VGA_USER_MAPPED.store(false, Ordering::SeqCst);
 }

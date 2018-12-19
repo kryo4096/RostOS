@@ -1,0 +1,10 @@
+{
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/rost_libc"
+    ],
+    "files.associations": {
+        "keyboard.h": "c",
+        "vga.h": "c",
+        "port_io.h": "c"
+    }
+}

@@ -61,7 +61,7 @@ use linked_list_allocator::LockedHeap;
 #[global_allocator]
 static ALLOCATOR: LockedHeap = LockedHeap::empty();
 
-static DISK_IMAGE: &'static [u8] = include_bytes!("../disk.img");
+static DISK_IMAGE: &'static [u8] = include_bytes!("../../disk.img");
 
 use consts::*;
 
@@ -120,7 +120,7 @@ pub extern "C" fn kernel_main() -> ! {
     unsafe {
 
 
-        process::schedule(Process::create(b"bin/init"));
+        process::schedule(Process::create(b"bin/init", vec!(b'/')));
         process::activate_scheduler();
         
         loop {}

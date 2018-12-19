@@ -20,6 +20,7 @@ pub unsafe fn load_elf(_elf: &[u8]) -> Result<LoadInfo, &'static str> {
     header::sanity_check(&elf)?;
 
     let entry_point = elf.header.pt2.entry_point();
+    println!("entry_point: 0x{:x}", entry_point);
 
     let segments : Vec<ProgramHeader64> = elf.program_iter().map(|p| match p {
         ProgramHeader::Ph64(header) => {
@@ -30,15 +31,12 @@ pub unsafe fn load_elf(_elf: &[u8]) -> Result<LoadInfo, &'static str> {
         }
     }).collect::<Result<Vec<_>,_>>()?;
 
-    let image_start = segments.iter().map(|s|s.virtual_addr).min().ok_or("invalid elf")?;
-    let image_end = segments.iter().map(|s|s.virtual_addr + s.mem_size).max().ok_or("invalid elf")?;
-
-    memory::map_range(image_start, image_end, PageTableFlags::PRESENT | PageTableFlags::WRITABLE );
 
     for segment in segments {
         let vaddr = segment.virtual_addr;
         let off = segment.offset;
         let file_size = segment.file_size;
+        memory::map_range_all(vaddr, vaddr + segment.mem_size, PageTableFlags::PRESENT | PageTableFlags::WRITABLE);
 
         ptr::copy(_elf.as_ptr().offset(off as _), vaddr as _, file_size as _);
     }

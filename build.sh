@@ -1,17 +1,13 @@
 #!/bin/bash
 
+rm -rf ramdisk/bin
 mkdir -p ramdisk/bin
 
-for dir in rost_programs/*; do
-    cd ${dir}
-    cargo xbuild --target ../../x86_64-rost_os.json
-    cp target/x86_64-rost_os/debug/$(basename ${dir}) ../../ramdisk/bin/$(basename ${dir})
-    cd ../..
-
-    
+for dir in programs/*; do
+    gcc -Irost_libc -mno-red-zone -nostartfiles ${dir}/* rost_libc/* -o ramdisk/bin/$(basename ${dir})
 done
 
-fscreate rost_kernel/disk.img 1024 ramdisk
+fscreate disk.img 1024 ramdisk
 
 cd rost_kernel
 
