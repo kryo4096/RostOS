@@ -16,9 +16,16 @@ pub extern "x86-interrupt" fn page_fault(
 ) {
     println!("EXCEPTION: PAGE FAULT\n{:#?}\n{:#?}", frame, pcode);
 
-
-    loop {
-        unsafe{asm!("hlt")}
+    unsafe {
+        ::process::exit();
+        
+        loop {
+            if let Some(scancode) = ::keyboard::pop_scancode() {
+                if scancode == 0x1 {
+                    break;
+                }
+            }
+        }
     }
 }
 
