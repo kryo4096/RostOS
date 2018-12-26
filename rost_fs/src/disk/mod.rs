@@ -49,7 +49,9 @@ impl DiskAddress {
 }
 
 pub trait Disk {
+    /// Get a mutable reference to a block on disk
     fn get_block(&self, index: DiskAddress) -> Option<&mut Block>;
+    /// Get the total amount of blocks.
     fn block_count(&self) -> u64;
 }
 

@@ -10,8 +10,6 @@ pub const BLOCK_SIZE: u64 = 4096;
 pub const MAGIC: u64 = 0xdead_cafe_beef_feed;
 pub const BLOCK_DATA_SIZE: usize = BLOCK_SIZE as usize - mem::size_of::<DiskAddress>();
 
-
-
 pub type Block = [u8; BLOCK_SIZE as usize];
 
 pub struct RootBlock {
@@ -100,43 +98,6 @@ pub fn data_blocks_required(data_size: u64) -> u64 {
     data_size / BLOCK_DATA_SIZE as u64 + 1
 }
 
-/*pub fn write_to_data_block(
-    disk: &impl Disk,
-    data_block_addr: DiskAddress,
-    data: &[u8],
-) -> Result<(), NoneError> {
-    let mut block_nr = 0;
-    let mut byte_nr = 0;
-    let mut addr = data_block_addr;
-
-    while block_nr * BLOCK_DATA_SIZE + byte_nr < data.len() {
-
-        if byte_nr == BLOCK_DATA_SIZE {
-            byte_nr = 0;
-            block_nr += 1;
-
-            let current_block = get_data_block(disk, addr)?;
-
-            if current_block.next_block.is_null() {
-                current_block.next_block = allocate_block(disk)?;
-                get_data_block(disk, current_block.next_block)?.next_block = DiskAddress::NULL;
-            }
-
-            addr = current_block.next_block;
-        } else if byte_nr > BLOCK_DATA_SIZE  {
-            unreachable!();
-        }
-        
-        get_data_block(disk, addr)?.data[byte_nr] = data[block_nr * BLOCK_DATA_SIZE + byte_nr];
-
-        byte_nr += 1;
-
-   
-    }
-
-    Ok(())
-}*/
-
 pub fn write_to_data_block(
     disk: &impl Disk,
     mut data_block_addr: DiskAddress,
@@ -166,42 +127,6 @@ pub fn write_to_data_block(
 
     Ok(())
 }
-
-/*
-pub fn copy_from_data_block(
-    disk: &impl Disk,
-    data_block_addr: DiskAddress,
-    buffer: &mut Vec<u8>,
-    size: u64,
-) -> Result<(), NoneError> {
-    let mut block_nr = 0;
-    let mut byte_nr = 0;
-    let mut addr = data_block_addr;
-
-    while block_nr * BLOCK_DATA_SIZE + byte_nr < size as usize {
-
-        if addr.is_null() {
-            buffer.clear();
-            return Err(NoneError);
-        }
-        
-        let data_block = get_data_block(disk, addr)?;
-
-        buffer.push(data_block.data[byte_nr]);
-        byte_nr += 1;
-
-        if byte_nr >= BLOCK_DATA_SIZE {
-            
-            byte_nr = 0;
-            block_nr += 1;
-            
-            let addr = data_block.next_block;
-
-        }
-    }
-
-    Ok(())
-}*/
 
 pub fn copy_from_data_block(
     disk: &impl Disk,
