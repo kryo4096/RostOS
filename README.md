@@ -17,7 +17,7 @@ To make use of these features, there are system calls which are abstracted away 
 
 To begin, you first need to download the language itself. Because an OS requires certain unstable features, a nightly version of the Rust toolchain has to be installed. This can be done using [rustup](https://rustup.rs/), the official rust toolchain installation program. You also have to add the `~/.cargo/bin` directory to `$PATH` so you can use the buildtools installed later.
 
-Right now, RostOS officially only supports running C programs compiled to ELF. To build these a C compiler is required, per default `gcc`. If you wish to use a different one, you can change the line containing `gcc` in `build.sh` and change it accordingly.
+Right now, RostOS officially only supports running C programs compiled to ELF. To build these a C compiler is required, per default `gcc`. If you wish to use a different one, you can change the line containing `gcc` in `build.sh` accordingly.
 
 If you want to run the OS you need some sort of virtual machine. To use the automatic build scripts, the `qemu-system-x86_64` binary has to be present in `$PATH`, which can be downloaded from [www.qemu.org](https://www.qemu.org) or preferably installed with your distribution's package manager.
 
