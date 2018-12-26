@@ -1,4 +1,4 @@
-#include "syscall.h"
+#include "debug.h"
 #include "std.h"
 
 static uint64_t PID;
@@ -11,7 +11,7 @@ void _start() {
 
         if((get_ticks() - ticks) > 10) {
             ticks = get_ticks();
-            debug_num(PID, DECIMAL);
+            debug_printnum(PID, DECIMAL);
         }
 
     }

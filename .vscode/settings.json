@@ -8,6 +8,8 @@
         "port_io.h": "c",
         "process.h": "c",
         "std.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "syscall.h": "c",
+        "debug.h": "c"
     }
 }

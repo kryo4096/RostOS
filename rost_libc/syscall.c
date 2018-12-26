@@ -2,18 +2,15 @@
 #include "std.h"
 #include "path.h"
 
-// TODO: revamp syscall system, replace functions with one function and syscall number constants
-
-void println(char* str) {
-
-    size_t len = strlen(str);
-
-    asm("mov $1, %%rdi" ::: "rdi"); 
-    asm("mov %0, %%rsi" :: "r" (str) : "rsi");
-    asm("mov %0, %%rdx" :: "r" (len): "rdx");
+// if this breaks, it's probably because the calling covention changed
+uint64_t syscall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8, uint64_t r9) {
     asm("int $0x80");
 }
 
+
+// old syscall functions
+
+/*
 void print(char* str) {
 
     size_t len = strlen(str);
@@ -26,10 +23,12 @@ void print(char* str) {
 
 void debug_num(uint64_t num, format f) {
 
-    asm("mov $2, %%rdi" ::: "rdi"); 
-    asm("mov %0, %%rsi" :: "r" (num) : "rsi");
-    asm("mov %0, %%rdx" :: "r" ((uint64_t)f): "rdx");
-    asm("int $0x80":::"rax");       
+    syscall(2,num, f, 0, 0, 0);
+
+    //asm("mov $2, %%rdi" ::: "rdi"); 
+    //asm("mov %0, %%rsi" :: "r" (num) : "rsi");
+    //asm("mov %0, %%rdx" :: "r" ((uint64_t)f): "rdx");
+    //asm("int $0x80":::"rax");       
 }
 
 uint64_t get_ticks() {
@@ -47,8 +46,6 @@ uint8_t get_scancode() {
     asm("mov %%rax, %0": "=r" (scancode)::);
     return (uint8_t) scancode;
 }
-
-
 
 uint64_t get_pid() {
     uint64_t pid;

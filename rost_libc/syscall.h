@@ -2,30 +2,25 @@
 #define SYSCALL_H
 #include "std.h"
 
-void println(char* str);
+#define SYS_DEBUG_PRINT 0x0
+#define SYS_DEBUG_PRINTNUM 0x2
 
-void print(char* str);
+#define SYS_TIME_GETTICKCOUNT 0x10
 
-typedef enum format {
-    BINARY = 0x0,
-    OCTAL = 0x1,
-    DECIMAL = 0x2,
-    HEXADECIMAL = 0x3,
-} format;
+#define SYS_KB_POPSCANCODE 0x20
 
-void debug_num(uint64_t num, format f);
+#define SYS_PROC_GETPID 0x30
+#define SYS_PROC_EXIT 0x31
+#define SYS_PROC_EXECUTE 0x32
+#define SYS_PROC_WAITPID 0x33
 
-uint64_t get_ticks();
-uint8_t get_scancode();
+#define SYS_VGA_MAP 0x40
+#define SYS_VGA_UNMAP 0x41
 
 
-uint64_t get_pid();
 
-uint64_t map_vga();
-uint64_t unmap_vga();
 
-void sys_exit();
-uint64_t execute(char* path);
-void wait_pid(uint64_t pid);
+uint64_t syscall(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t rcx, uint64_t r8, uint64_t r9);
+
 
 #endif
