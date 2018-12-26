@@ -44,7 +44,7 @@ Running your custom program is easy: `build.sh` will automatically compile all p
 
 * No heap is available, so you cannot use `malloc`.
 * Officially, only the `rost_std` headers can be used.
-* Try not to use `syscall.h` but the the other headers, which are mostly abstractions around it. (`syscall.h` is very hacky right now anyways)
+* Try not to use `syscall.h` but the the other headers, which are mostly abstractions around it.
 
 
 
