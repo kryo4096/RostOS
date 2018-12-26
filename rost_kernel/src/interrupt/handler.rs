@@ -2,7 +2,7 @@ use consts::*;
 use x86_64::instructions::port::Port;
 use x86_64::structures::idt::ExceptionStackFrame;
 use x86_64::structures::idt::PageFaultErrorCode;
-
+use alloc::string::String;
 pub extern "x86-interrupt" fn breakpoint(frame: &mut ExceptionStackFrame) {
     println!(
         "breakpoint \nrip=0x{:x}",
@@ -14,7 +14,11 @@ pub extern "x86-interrupt" fn page_fault(
     frame: &mut ExceptionStackFrame,
     pcode: PageFaultErrorCode,
 ) {
-    println!("EXCEPTION: PAGE FAULT\n{:#?}\n{:#?}", frame, pcode);
+    {
+        let current = ::process::Process::current();
+
+        println!("EXCEPTION: PAGE FAULT\n{:#?}\n{:#?}\nin process: {}", frame, pcode, String::from_utf8_lossy(&current.read().name));
+    }
 
     unsafe {
         ::process::exit();
