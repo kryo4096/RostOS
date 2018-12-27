@@ -89,7 +89,12 @@ void vt_set_color(uint8_t _color_code) {
 }
 
 char* vt_readln(char* prompt) {
-    static char line[81] = {};
+    static char line[81];
+
+    for(int i = 0; i < 81; i++) {
+        line[i] = 0;
+    }
+
     static KeyCase key_case = KB_CASE_LOWER;
 
     uint8_t c;
@@ -132,6 +137,10 @@ char* vt_readln(char* prompt) {
     } while(c != '\n' && cursor < 80);
 
     line[cursor] = 0;
+
+    if(line_index == 0) {
+        return 0;
+    }
 
     return (char*) (&line);
 }

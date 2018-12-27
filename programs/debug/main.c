@@ -1,6 +1,7 @@
 #include "syscall.h"
 #include "std.h"
-
+#include "keyboard.h"
+#include "process.h"
 static uint64_t PID;
 
 void _start() {
@@ -13,6 +14,10 @@ void _start() {
             ticks = get_ticks();
             debug_num(PID, DECIMAL);
         }
+
+        /*if(kb_pollevent().type == KB_PRESS) {
+            proc_exit();
+        }*/
 
     }
 }
