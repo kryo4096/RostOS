@@ -1,6 +1,6 @@
-ramdisk
 disk.img
 **/target/
 **/*.bin
 **/*.dmp
 **/dump
+**/bin

@@ -30,14 +30,18 @@ pub unsafe fn load_elf(_elf: &[u8]) -> Result<LoadInfo, &'static str> {
         }
     }).collect::<Result<Vec<_>,_>>()?;
 
+    
 
     for segment in segments {
+        
+        //println!("{:x?}", segment);
         let vaddr = segment.virtual_addr;
         let off = segment.offset;
         let file_size = segment.file_size;
         memory::map_range_all(vaddr, vaddr + segment.mem_size, PageTableFlags::PRESENT | PageTableFlags::WRITABLE);
 
         ptr::copy(_elf.as_ptr().offset(off as _), vaddr as _, file_size as _);
+        
     }
 
     Ok(LoadInfo {

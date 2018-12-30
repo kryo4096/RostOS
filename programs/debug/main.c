@@ -15,9 +15,11 @@ void _start() {
             debug_num(PID, DECIMAL);
         }
 
-        /*if(kb_pollevent().type == KB_PRESS) {
+        KeyEvent event = kb_pollevent();
+
+        if(event.type == KB_PRESS && event.keycode == KEY_ESCAPE) {
             proc_exit();
-        }*/
+        }
 
     }
 }

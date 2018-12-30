@@ -173,6 +173,8 @@ impl Process {
             PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
         ).expect("Process::create(): failed to map user stack");
 
+        
+
         let syscall_stack_start = KERNEL_SYSCALL_STACK_START + KERNEL_SYSCALL_STACK_SIZE * (2*pid + 1)  - 1;
         let syscall_stack_end =syscall_stack_start - KERNEL_SYSCALL_STACK_SIZE;
 
@@ -192,9 +194,9 @@ impl Process {
             .expect("Process::create(): executable doesn't exist");
 
         ::fs::read_file(&mut *::fs::tree_mut(), file, &mut buf);
-
+        
         let info = ::elf::load_elf(&mut buf).expect("Process::create(): failed to load executable");
-
+        
         process.push(info.entry_point); // ret
         process.push(0);
         process.push(0);
@@ -258,6 +260,8 @@ pub fn activate_scheduler() {
     CTX_SWITCH_LOCK.store(false, Ordering::SeqCst);
 }
 
+use time;
+
 fn next_process() -> u64 {
     let mut queue = process_queue();
 
@@ -271,6 +275,14 @@ fn next_process() -> u64 {
 
             if let State::Waiting(WaitReason::ProcessExit(wait_pid)) = process.state {
                 if Process::get(wait_pid).is_none() {
+                    process.state = State::Runnable;
+                }
+
+                queue.push_front(pid);
+            }
+
+            if let State::Waiting(WaitReason::Timer(time)) = process.state {
+                if time::get() > time {
                     process.state = State::Runnable;
                 }
 

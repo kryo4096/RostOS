@@ -39,7 +39,7 @@ pub unsafe extern "C" fn __syscall(
         0x33 => wait_exit(rsi),
         0x40 => map_vga(),
         0x41 => unmap_vga(),
-        _ => panic!("Invalid syscall!"),
+        _ => panic!("Invalid syscall! 0x{:x}", rdi),
     }
 }
 
@@ -92,6 +92,7 @@ unsafe fn execute(path_ptr: u64, path_len: u64) -> u64 {
         _ => return 0,
     };
 
+
     if is_file(&mut *fs::tree_mut(), node).is_ok() {
         let mut vec = Vec::new();
         vec.extend_from_slice(path);
@@ -107,8 +108,17 @@ unsafe fn execute(path_ptr: u64, path_len: u64) -> u64 {
     }
 }
 
+use process::WaitReason;
+
+use time;
+
 unsafe fn wait_exit(pid: u64) -> u64 {
     process::wait(::process::WaitReason::ProcessExit(pid));
+    0
+}
+
+unsafe fn wait_time(ticks: u64) -> u64 {
+    process::wait(WaitReason::Timer(time::get() + ticks));
     0
 }
 
@@ -125,11 +135,24 @@ unsafe fn debug(num: u64, f: u64) -> u64 {
 }
 
 unsafe fn time() -> u64 {
-    ::time::get()
+    time::get()
 }
 
 use consts::*;
 use x86_64::structures::paging::PageTableFlags;
+
+unsafe fn vmap(start: u64, end: u64) -> u64 {
+    memory::map_range_all(start, end, PageTableFlags::PRESENT | PageTableFlags::WRITABLE);
+    0
+}
+
+unsafe fn pmap(virt: u64, phys: u64) -> u64 {
+    memory::map_to_address(virt, phys, PageTableFlags::PRESENT | PageTableFlags::WRITABLE);
+
+    0
+}
+
+
 
 unsafe fn map_vga() -> u64 {
     if ::vga_buffer::map_for_user().is_ok() {

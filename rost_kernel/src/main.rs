@@ -122,8 +122,10 @@ pub extern "C" fn kernel_main() -> ! {
 
         process::schedule(Process::create(b"bin/init", vec!(b'/')));
         process::activate_scheduler();
-        
         loop {}
+        
+        
+        
 
 
     }
