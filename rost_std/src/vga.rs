@@ -7,10 +7,12 @@ use core::marker::PhantomData;
 use crate::syscall;
 use crate::syscall::*;
 
+use crate::memory;
+
 const VGA_WIDTH: usize = 80;
 const VGA_HEIGHT: usize = 25;
 
-static mut VGA_ADDRESS: *mut u16 = 0 as _;
+static mut VGA_ADDRESS: *mut u16 = (memory::MAX_ADDRESS + 1 - 0x100_000 + 0xb8000) as _;
 static mut VGA_BUFFER: [u16; VGA_WIDTH * VGA_HEIGHT] = [0;VGA_WIDTH * VGA_HEIGHT];
 
 static VGA_LOCK: AtomicBool = AtomicBool::new(false);
@@ -62,7 +64,7 @@ impl VGA {
     pub fn try_get() -> Option<Self> {
         if !VGA_LOCK.compare_and_swap(false, true, Ordering::SeqCst) {
             unsafe {
-                VGA_ADDRESS = syscall!(SYS_MAP_VGA) as _;
+                memory::map_to(VGA_ADDRESS as _, 0xb8000);
             }
             Some(Self {
                 data: PhantomData,
@@ -99,9 +101,6 @@ impl VGA {
 
 impl Drop for VGA {
     fn drop(&mut self) {
-        unsafe {
-            syscall!(SYS_UNMAP_VGA);
-        }
         VGA_LOCK.store(false, Ordering::SeqCst);
     }
 }

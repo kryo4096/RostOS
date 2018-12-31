@@ -5,9 +5,9 @@ use spin::{Once, RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 use alloc::string::String;
 use alloc::vec::Vec;
-use x86_64::structures::paging::PageTableFlags;
 use rost_fs::disk::*;
 use rost_fs::node::*;
+use x86_64::structures::paging::PageTableFlags;
 
 pub use rost_fs::fs::*;
 
@@ -40,4 +40,3 @@ pub unsafe fn init() {
 
     disk.clone_from_slice(::DISK_IMAGE);
 }
-

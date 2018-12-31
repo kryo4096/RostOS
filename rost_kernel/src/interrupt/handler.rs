@@ -1,8 +1,8 @@
+use alloc::string::String;
 use consts::*;
 use x86_64::instructions::port::Port;
 use x86_64::structures::idt::ExceptionStackFrame;
 use x86_64::structures::idt::PageFaultErrorCode;
-use alloc::string::String;
 pub extern "x86-interrupt" fn breakpoint(frame: &mut ExceptionStackFrame) {
     println!(
         "breakpoint \nrip=0x{:x}",
@@ -17,75 +17,81 @@ pub extern "x86-interrupt" fn page_fault(
     {
         let current = ::process::Process::current();
 
-        println!("EXCEPTION: PAGE FAULT\n{:#?}\n{:#?}\nin process: {}", frame, pcode, String::from_utf8_lossy(&current.read().name));
+        println!(
+            "EXCEPTION: PAGE FAULT\n{:#?}\n{:#?}\nin process: {}",
+            frame,
+            pcode,
+            String::from_utf8_lossy(&current.read().name)
+        );
     }
 
     unsafe {
         ::process::exit();
-        
-        loop {
-            if let Some(scancode) = ::keyboard::pop_scancode() {
-                if scancode == 0x1 {
-                    break;
-                }
-            }
-        }
     }
 }
 
 pub extern "x86-interrupt" fn double_fault(frame: &mut ExceptionStackFrame, error_code: u64) {
-    println!("EXCEPTION: DOUBLE FAULT\n{:#?} ec: 0x{:x}", frame, error_code);
+    println!(
+        "EXCEPTION: DOUBLE FAULT\n{:#?} ec: 0x{:x}",
+        frame, error_code
+    );
     loop {
-        unsafe{asm!("hlt")}
+        unsafe { asm!("hlt") }
     }
 }
 
 pub extern "x86-interrupt" fn gpf(frame: &mut ExceptionStackFrame, error_code: u64) {
     println!("EXCEPTION: GENERAL PROTECTION FAULT\n{:#?}", frame);
     loop {
-        unsafe{asm!("hlt")}
+        unsafe { asm!("hlt") }
     }
 }
 
 pub extern "x86-interrupt" fn ui(frame: &mut ExceptionStackFrame) {
     println!("EXCEPTION: INVALID INSTRUCTION\n{:#?}", frame);
     loop {
-        unsafe{asm!("hlt")}
+        unsafe { asm!("hlt") }
     }
 }
 
 pub extern "x86-interrupt" fn invalid_tss(frame: &mut ExceptionStackFrame, error_code: u64) {
     println!("EXCEPTION: INVALID TSS\n{:#?}", frame);
     loop {
-        unsafe{asm!("hlt")}
+        unsafe { asm!("hlt") }
     }
 }
 
-pub extern "x86-interrupt" fn stack_segment_fault(frame: &mut ExceptionStackFrame, error_code: u64) {
+pub extern "x86-interrupt" fn stack_segment_fault(
+    frame: &mut ExceptionStackFrame,
+    error_code: u64,
+) {
     println!("EXCEPTION: #SS\n{:#?}", frame);
     loop {
-        unsafe{asm!("hlt")}
+        unsafe { asm!("hlt") }
     }
 }
 
 pub extern "x86-interrupt" fn security_exception(frame: &mut ExceptionStackFrame, error_code: u64) {
     println!("EXCEPTION: SECURITY EXEPTION\n{:#?}", frame);
     loop {
-        unsafe{asm!("hlt")}
+        unsafe { asm!("hlt") }
     }
 }
 
-pub extern "x86-interrupt" fn segment_not_present(frame: &mut ExceptionStackFrame, error_code: u64) {
+pub extern "x86-interrupt" fn segment_not_present(
+    frame: &mut ExceptionStackFrame,
+    error_code: u64,
+) {
     println!("EXCEPTION: SEGMENT NOT PRESENT\n{:#?}", frame);
     loop {
-        unsafe{asm!("hlt")}
+        unsafe { asm!("hlt") }
     }
 }
 
 pub extern "x86-interrupt" fn overflow(frame: &mut ExceptionStackFrame) {
     println!("EXCEPTION: OVERFLOW\n{:#?}", frame);
     loop {
-        unsafe{asm!("hlt")}
+        unsafe { asm!("hlt") }
     }
 }
 
@@ -107,7 +113,6 @@ pub extern "x86-interrupt" fn bound_range_exceeded(frame: &mut ExceptionStackFra
     println!("EXCEPTION: Bound Range Exceeded\n{:#?}", frame);
     loop {}
 }
-
 
 extern "C" {
     pub fn syscall_handler();
@@ -142,22 +147,24 @@ pub fn syscall() {
 
 use x86_64::VirtAddr;
 
-use ::process::Registers;
+use process::{self, signal};
 
-pub extern "x86-interrupt" fn tick(frame: &mut ExceptionStackFrame) {        
+
+pub extern "x86-interrupt" fn tick(frame: &mut ExceptionStackFrame) {
     unsafe {
         ::time::tick();
         ::interrupt::send_eoi(0);
         ::process::update();
     }
-
 }
+
+
 
 pub extern "x86-interrupt" fn keyboard(frame: &mut ExceptionStackFrame) {
     let port = Port::new(KB_DATA_PORT);
     unsafe {
         let scancode: u8 = port.read();
-        ::keyboard::push_scancode(scancode);
+        signal::signal_bus().call(0, scancode as _, 0,0,0);
         ::interrupt::send_eoi(1);
     }
 }

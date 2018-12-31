@@ -13,6 +13,9 @@ mod syscall;
 pub mod ascii;
 pub mod debug;
 pub mod process;
+pub mod time;
+pub mod memory;
+pub mod signal;
 
 #[no_mangle]
 #[panic_handler]

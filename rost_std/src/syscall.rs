@@ -1,18 +1,26 @@
 //Debug syscalls
 pub const SYS_DEBUG_PRINT: u64 = 0x0;
 
-// Keyboard syscalls
-pub const SYS_POLL_KEYBOARD: u64 = 0x20;
+// Time syscalls
+pub const SYS_GET_TIME: u64 = 0x10;
+
+// Signal syscalls
+pub const SYS_SUBSCRIBE: u64 = 0x20;
+pub const SYS_ADD_CHANNEL: u64 = 0x21;
+pub const SYS_SEND: u64 = 0x22;
 
 // Process syscalls
 pub const SYS_PROCESS_GETPID: u64 = 0x30;
 pub const SYS_PROCESS_EXIT: u64 = 0x31;
 pub const SYS_PROCESS_EXECUTE: u64 = 0x32;
 pub const SYS_PROCESS_WAIT: u64 = 0x33;
+pub const SYS_PROCESS_SLEEP: u64 = 0x34;
+pub const SYS_PROCESS_KILL: u64 = 0x35;
 
-// VGA syscalls
-pub const SYS_MAP_VGA: u64 = 0x40;
-pub const SYS_UNMAP_VGA: u64 = 0x41;
+
+// MMU syscalls
+pub const SYS_VMAP: u64 = 0x50;
+pub const SYS_PMAP: u64 = 0x51;
 
 
 

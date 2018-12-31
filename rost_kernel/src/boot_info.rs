@@ -20,5 +20,4 @@ pub fn print_map() {
     for entry in info.memory_map.iter() {
         println!("{:?}", entry);
     }
-
 }

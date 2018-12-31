@@ -21,11 +21,11 @@
 extern crate alloc;
 extern crate bootloader;
 extern crate linked_list_allocator;
-extern crate spin;
-extern crate x86_64;
 extern crate rost_fs;
-extern crate xmas_elf;
+extern crate spin;
 extern crate volatile;
+extern crate x86_64;
+extern crate xmas_elf;
 
 #[macro_use]
 extern crate lazy_static;
@@ -34,27 +34,26 @@ extern crate lazy_static;
 mod vga_buffer;
 mod boot_info;
 mod consts;
+mod elf;
+mod fs;
+mod gdt;
 mod interrupt;
 mod memory;
 mod panic;
 mod process;
+mod random;
 mod syscall;
 mod time;
-mod random;
-mod elf;
-mod fs;
-mod gdt;
-mod keyboard;
 
 use core::ptr;
 
+use alloc::string::String;
+use alloc::vec::Vec;
+use fs::*;
+use memory::frame_allocator::FrameStackAllocator;
 use x86_64::structures::paging::*;
 use x86_64::ux::u9;
 use x86_64::{PhysAddr, VirtAddr};
-use fs::*;
-use alloc::vec::Vec;
-use alloc::string::String;
-use memory::frame_allocator::FrameStackAllocator;
 
 use linked_list_allocator::LockedHeap;
 
@@ -79,7 +78,7 @@ pub extern "C" fn kernel_init() {
     unsafe {
         // initialize memory management
         memory::init();
-        
+
         // map vga buffer to high memory
         memory::map_to_address(
             VGA_BUFFER_VADDR,
@@ -96,7 +95,7 @@ pub extern "C" fn kernel_init() {
             PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
         );
 
-        // initalize heap allocator11
+        // initalize heap allocator
         ALLOCATOR
             .lock()
             .init(KERNEL_HEAP_START as usize, KERNEL_HEAP_SIZE as usize);
@@ -108,8 +107,6 @@ pub extern "C" fn kernel_init() {
         fs::init();
         syscall::init();
         process::init();
-
-
     }
 }
 
@@ -118,18 +115,8 @@ use process::Process;
 #[no_mangle]
 pub extern "C" fn kernel_main() -> ! {
     unsafe {
-
-
-        process::schedule(Process::create(b"bin/init", vec!(b'/')));
+        process::schedule(Process::create(b"/bin/init", vec![b'/']));
         process::activate_scheduler();
         loop {}
-        
-        
-        
-
-
     }
 }
-
-
-

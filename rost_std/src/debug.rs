@@ -1,6 +1,7 @@
 use core::fmt;
 
-use crate::syscall::*;
+#[macro_use]
+use crate::syscall::{self, *};
 
 struct DebugPrinter;
 

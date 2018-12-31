@@ -1,9 +1,9 @@
 use consts::*;
 use spin::{Mutex, MutexGuard, Once};
-use x86_64::structures::paging::*;
-use x86_64::{PhysAddr, VirtAddr};
 use x86_64::registers::control::{Cr3, Cr3Flags};
+use x86_64::structures::paging::*;
 use x86_64::ux::u9;
+use x86_64::{PhysAddr, VirtAddr};
 
 pub mod frame_allocator;
 mod map;
@@ -47,7 +47,7 @@ pub fn frame_allocator() -> MutexGuard<'static, FrameStackAllocator> {
 
 pub unsafe fn load_table(new_paddr: u64) -> u64 {
     let old_paddr;
-    
+
     asm!("mov $0, cr3":"=r"(old_paddr):::"intel", "volatile");
     asm!("mov cr3, $0"::"r"(new_paddr)::"intel", "volatile");
     old_paddr
@@ -56,7 +56,8 @@ pub unsafe fn load_table(new_paddr: u64) -> u64 {
 pub fn create_table(position: u64) -> u64 {
     unsafe {
         let vaddr = PT_START + position * PAGE_SIZE;
-        let frame = map(vaddr, PageTableFlags::WRITABLE | PageTableFlags::PRESENT).expect("failed to map page");
+        let frame = map(vaddr, PageTableFlags::WRITABLE | PageTableFlags::PRESENT)
+            .expect("failed to map page");
 
         let mut table = &mut *(vaddr as *mut PageTable);
 
@@ -66,13 +67,16 @@ pub fn create_table(position: u64) -> u64 {
             let i = u9::new(i);
             table[i] = p4_t()[i].clone();
         }
-        
+
         for i in 0..256u16 {
             let i = u9::new(i);
             table[i] = PageTableEntry::new();
         }
 
-        table[u9::new(511)].set_addr(PhysAddr::new(frame), PageTableFlags::PRESENT | PageTableFlags::WRITABLE);
+        table[u9::new(511)].set_addr(
+            PhysAddr::new(frame),
+            PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
+        );
 
         frame
     }
@@ -131,7 +135,6 @@ pub fn map_range_all(start_addr: u64, end_addr: u64, flags: PageTableFlags) {
     let end_page = Page::<Size4KiB>::containing_address(VirtAddr::new(end_addr));
 
     //println!("mapping from 0x{:x} to 0x{:x}", start_page.start_address().as_u64(), end_page.start_address().as_u64());
-
 
     for page in Page::range_inclusive(start_page, end_page) {
         let frame = frame_allocator().alloc().expect("no more memory");

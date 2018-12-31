@@ -1,8 +1,6 @@
 use crate::ascii;
 
-#[macro_use]
-use crate::syscall;
-use crate::syscall::*;
+
 
 use core::marker::PhantomData;
 
@@ -227,7 +225,7 @@ impl Keyboard {
 
     pub fn poll_event(&self) -> Option<KeyEvent> {
         let scancode = unsafe {
-            syscall!(SYS_POLL_KEYBOARD) as u8
+            0 as u8
         };
 
         KeyEvent::from_scancode(scancode)

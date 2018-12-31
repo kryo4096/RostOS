@@ -1,0 +1,8 @@
+[package]
+name = "terminal"
+version = "0.1.0"
+authors = ["kryo4096 <kryo4096@users.noreply.github.com>"]
+edition = "2018"
+
+[dependencies]
+rost_std = {path="../../rost_std"}

@@ -3,7 +3,7 @@ name = "rost_std"
 version = "0.1.0"
 
 [[package]]
-name = "sh"
+name = "terminal"
 version = "0.1.0"
 dependencies = [
  "rost_std 0.1.0",

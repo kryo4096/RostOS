@@ -5,7 +5,6 @@ use x86_64::instructions::port::{Port, PortReadWrite};
 
 const CHANNEL_0: Port<u8> = Port::new(0x40);
 
-
 pub fn set_interval(micros: u64) {
     const BASE_NANOS: u64 = 838;
 
@@ -15,14 +14,12 @@ pub fn set_interval(micros: u64) {
         CHANNEL_0.write((mult & 0xff) as u8);
         CHANNEL_0.write((mult >> 8) as u8);
     }
-
 }
-
 
 static TIME: AtomicU64 = AtomicU64::new(0);
 
 pub fn tick() {
-    TIME.fetch_add(1,Ordering::SeqCst);
+    TIME.fetch_add(1, Ordering::SeqCst);
 }
 
 pub fn get() -> u64 {

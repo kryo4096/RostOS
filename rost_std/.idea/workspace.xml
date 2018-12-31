@@ -2,10 +2,52 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c7db019c-d8b0-4557-a3ca-bbc790a2c4e1" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/keyboard.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/../.vscode/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../build.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../clean.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../create_program.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../install_tools.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../program_template/main.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../programs/debug/main.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../programs/gol/main.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../programs/init/main.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../programs/pong/main.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../programs/sh/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../programs/sh/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../programs/shell/main.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/.idea/rust_kernel.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/boot_info.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/boot_info.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/consts.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/consts.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/elf/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/elf/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/fs/memory_view.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/fs/memory_view.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/fs/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/fs/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/gdt.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/gdt.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/interrupt/handler.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/interrupt/handler.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/interrupt/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/interrupt/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/interrupt/pic.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/interrupt/pic.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/keyboard/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/keyboard/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/memory/frame_allocator.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/memory/frame_allocator.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/memory/map.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/memory/map.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/memory/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/memory/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/panic.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/panic.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/process/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/process/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/random.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/random.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/syscall.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/syscall.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/time/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/time/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rost_kernel/src/vga_buffer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../rost_kernel/src/vga_buffer.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/rost_std.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/process.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/process.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/syscall.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/syscall.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vga.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/vga.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../run.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../run_vtx.sh" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -13,49 +55,22 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FUSProjectUsageTrigger">
-    <session id="339856346">
-      <usages-collector id="statistics.lifecycle.project">
-        <counts>
-          <entry key="project.open.time.5" value="1" />
-          <entry key="project.opened" value="1" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.extensions.open">
-        <counts>
-          <entry key="rs" value="4" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.types.open">
-        <counts>
-          <entry key="Rust" value="4" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.extensions.edit">
-        <counts>
-          <entry key="rs" value="198" />
-          <entry key="txt" value="10" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.types.edit">
-        <counts>
-          <entry key="PLAIN_TEXT" value="10" />
-          <entry key="Rust" value="198" />
-        </counts>
-      </usages-collector>
-    </session>
-  </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/vga.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="232">
-              <caret line="79" column="16" lean-forward="true" selection-start-line="79" selection-start-column="16" selection-end-line="79" selection-end-column="16" />
-              <folding>
-                <element signature="e#936#937#0" expanded="true" />
-                <element signature="e#997#998#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="731">
+              <caret line="104" column="33" selection-start-line="104" selection-start-column="33" selection-end-line="104" selection-end-column="33" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/process.rs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="357">
+              <caret line="21" column="5" lean-forward="true" selection-start-line="21" selection-start-column="5" selection-end-line="21" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -63,17 +78,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/lib.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
+            <state relative-caret-position="289">
               <caret line="17" column="14" selection-start-line="17" selection-start-column="14" selection-end-line="17" selection-end-column="14" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/keyboard.rs">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="28">
-              <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
+              <caret line="2" selection-start-line="2" selection-end-line="2" />
             </state>
           </provider>
         </entry>
@@ -100,10 +115,10 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="2399" />
-    <option name="width" value="925" />
-    <option name="height" value="1074" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="1262" />
+    <option name="width" value="1305" />
+    <option name="height" value="1407" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -111,7 +126,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -128,12 +143,14 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1545078110454" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1546211368828" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
+    <property name="org.rust.hideToolchainNotifications" value="true" />
     <property name="settings.editor.selected.configurable" value="preferences.editor" />
   </component>
   <component name="RunDashboard">
@@ -149,7 +166,7 @@
     </option>
   </component>
   <component name="RunManager">
-    <configuration default="true" type="Applet" factoryName="Applet">
+    <configuration default="true" type="Applet">
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -187,7 +204,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="TestNG" factoryName="TestNG">
+    <configuration default="true" type="TestNG">
       <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
       <properties />
       <listeners />
@@ -195,11 +212,11 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
+    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType">
       <module name="" />
       <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
       <option name="PROGRAM_PARAMETERS" />
-      <predefined_log_file id="idea.log" enabled="true" />
+      <predefined_log_file enabled="true" id="idea.log" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -219,26 +236,26 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1920" y="0" width="1920" height="1168" extended-state="6" />
-    <editor active="true" />
+    <frame x="1262" y="0" width="1305" height="1407" extended-state="0" />
     <layout>
       <window_info id="Designer" order="0" />
       <window_info id="UI Designer" order="1" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Favorites" order="3" side_tool="true" />
       <window_info id="Image Layers" order="4" />
-      <window_info active="true" content_ui="combo" id="Project" order="5" visible="true" weight="0.11727079" />
+      <window_info active="true" content_ui="combo" id="Project" order="5" visible="true" weight="0.2128514" />
       <window_info id="Structure" order="6" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="0" />
       <window_info anchor="bottom" id="Event Log" order="1" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="2" show_stripe_button="false" />
       <window_info anchor="bottom" id="Message" order="3" />
       <window_info anchor="bottom" id="Find" order="4" />
-      <window_info anchor="bottom" id="Run" order="5" visible="true" weight="0.32985783" />
+      <window_info anchor="bottom" id="Run" order="5" weight="0.32967034" />
       <window_info anchor="bottom" id="Debug" order="6" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="7" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="8" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="9" />
+      <window_info anchor="right" id="Maven" />
       <window_info anchor="right" id="Capture Analysis" order="0" />
       <window_info anchor="right" id="Theme Preview" order="1" />
       <window_info anchor="right" id="Cargo" order="2" />
@@ -250,9 +267,6 @@
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="8" weight="0.25" />
     </layout>
   </component>
-  <component name="VcsContentAnnotationSettings">
-    <option name="myLimit" value="2678400000" />
-  </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/syscall.rs">
       <provider selected="true" editor-type-id="text-editor">
@@ -261,20 +275,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/vga.rs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="232">
-          <caret line="79" column="16" lean-forward="true" selection-start-line="79" selection-start-column="16" selection-end-line="79" selection-end-column="16" />
-          <folding>
-            <element signature="e#936#937#0" expanded="true" />
-            <element signature="e#997#998#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/lib.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
+        <state relative-caret-position="289">
           <caret line="17" column="14" selection-start-line="17" selection-start-column="14" selection-end-line="17" selection-end-column="14" />
         </state>
       </provider>
@@ -282,7 +285,21 @@
     <entry file="file://$PROJECT_DIR$/src/keyboard.rs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="28">
-          <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
+          <caret line="2" selection-start-line="2" selection-end-line="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/vga.rs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="731">
+          <caret line="104" column="33" selection-start-line="104" selection-start-column="33" selection-end-line="104" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/process.rs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="21" column="5" lean-forward="true" selection-start-line="21" selection-start-column="5" selection-end-line="21" selection-end-column="5" />
         </state>
       </provider>
     </entry>

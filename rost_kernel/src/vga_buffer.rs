@@ -41,10 +41,7 @@ const BUFFER_WIDTH: usize = 80;
 
 use volatile::Volatile;
 
-
 use core::sync::atomic::{AtomicBool, Ordering};
-
-
 
 struct Buffer {
     chars: [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
@@ -84,7 +81,6 @@ impl Writer {
                 self.buffer.chars[row][col].write(ScreenChar {
                     ascii_character: byte,
                     color_code,
-
                 });
                 self.column_position += 1;
             }
@@ -133,10 +129,10 @@ impl fmt::Write for Writer {
     }
 }
 
+use consts::VGA_BUFFER_VADDR;
 use lazy_static::lazy_static;
 use spin::Mutex;
 use x86_64::instructions::interrupts::without_interrupts;
-use ::consts::VGA_BUFFER_VADDR;
 lazy_static! {
     pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {
         column_position: 0,
@@ -148,11 +144,9 @@ lazy_static! {
 #[doc(hidden)]
 pub fn _print(args: fmt::Arguments) {
     use core::fmt::Write;
-    without_interrupts(||{
-        unsafe {
-            WRITER.force_unlock();
-            WRITER.lock().write_fmt(args).unwrap();
-        }
+    without_interrupts(|| unsafe {
+        WRITER.force_unlock();
+        WRITER.lock().write_fmt(args).unwrap();
     });
 }
 
@@ -170,11 +164,15 @@ macro_rules! print {
 use consts::*;
 use x86_64::structures::paging::PageTableFlags;
 
-pub fn map_for_user() -> Result<(),()> {
-    ::memory::map_to_address(USER_VGA, VGA_BUFFER_PADDR, PageTableFlags::PRESENT | PageTableFlags::WRITABLE);
+pub fn map_for_user() -> Result<(), ()> {
+    ::memory::map_to_address(
+        USER_VGA,
+        VGA_BUFFER_PADDR,
+        PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
+    );
     Ok(())
 }
 
-pub fn unmap_for_user(){
+pub fn unmap_for_user() {
     ::memory::unmap(USER_VGA);
 }
