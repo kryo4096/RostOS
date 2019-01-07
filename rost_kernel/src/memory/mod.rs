@@ -4,6 +4,7 @@ use x86_64::registers::control::{Cr3, Cr3Flags};
 use x86_64::structures::paging::*;
 use x86_64::ux::u9;
 use x86_64::{PhysAddr, VirtAddr};
+use process;
 
 pub mod frame_allocator;
 mod map;
@@ -22,7 +23,7 @@ pub fn debug_page_table() {
         let ent = &p4[i];
 
         if ent.flags().contains(PageTableFlags::PRESENT) {
-            println!("{}: {:?}", i, ent.flags());
+            println!("{}: {:?} => 0x{:x}", i, ent.flags(), ent.addr());
         }
     }
 }

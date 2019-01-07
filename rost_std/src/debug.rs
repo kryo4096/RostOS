@@ -1,3 +1,5 @@
+//! This module is provided as a means to access the kernel's built-in console. It is meant solely for debugging purposes.
+
 use core::fmt;
 
 #[macro_use]
@@ -14,6 +16,17 @@ impl fmt::Write for DebugPrinter {
             syscall!(SYS_DEBUG_PRINT, bytes.as_ptr(), bytes.len());
         }
         Ok(())
+    }
+}
+
+/// Writes a string of ascii bytes to the kernel console.
+pub fn write_bytes(bytes: &[u8]) {
+    if bytes.len() == 0 {
+        return;
+    }
+    
+    unsafe {
+        syscall!(SYS_DEBUG_PRINT, bytes.as_ptr(), bytes.len());
     }
 }
 

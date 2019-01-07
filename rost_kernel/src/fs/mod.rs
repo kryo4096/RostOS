@@ -11,14 +11,13 @@ use x86_64::structures::paging::PageTableFlags;
 
 pub use rost_fs::fs::*;
 
-pub mod memory_view;
-
 static mut DISK: RamDisk = RamDisk::new_empty();
 static NODE_TREE: Once<RwLock<NodeTree<'static, RamDisk>>> = Once::new();
 
 fn create_tree() -> RwLock<NodeTree<'static, RamDisk>> {
     unsafe { RwLock::new(NodeTree::new(&mut DISK)) }
 }
+
 
 pub fn tree() -> RwLockReadGuard<'static, NodeTree<'static, RamDisk>> {
     NODE_TREE.call_once(create_tree).read()

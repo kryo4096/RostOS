@@ -1,8 +1,6 @@
+///! This module contains procedures to interpret the data supplied by the keyboard signal. 
+
 use crate::ascii;
-
-
-
-use core::marker::PhantomData;
 
 const KEYMAP_LOWER: [u8; 87] = [
     0,
@@ -102,7 +100,9 @@ const KEYMAP_UPPER: [u8; 87] = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 ];
 
-pub mod scancodes {
+pub use self::scancodes::*;
+
+mod scancodes {
     pub const KEY_A: u8 = 0x1E;
     pub const KEY_B: u8 = 0x30;
     pub const KEY_C: u8 = 0x2E;
@@ -127,8 +127,8 @@ pub mod scancodes {
     pub const KEY_V: u8 = 0x2F;
     pub const KEY_W: u8 = 0x11;
     pub const KEY_X: u8 = 0x2D;
-    pub const KEY_Y: u8 = 0x15;
-    pub const KEY_Z: u8 = 0x2C;
+    pub const KEY_Y: u8 = 0x2C;
+    pub const KEY_Z: u8 = 0x15;
     pub const KEY_1: u8 = 0x02;
     pub const KEY_2: u8 = 0x03;
     pub const KEY_3: u8 = 0x04;
@@ -170,25 +170,50 @@ pub mod scancodes {
     pub const KEY_SCROLL_LOCK: u8 = 0x46;
 }
 
+/// This enum represents kind of a keyboard event: A `Press` event is sent when a key is pressed and a `Release` event is sent when a key is released.
 #[derive(Copy, Clone, PartialEq, Eq)]
 pub enum EventKind {
     Press,
     Release,
 }
 
+/// This enum represents the case of a letter.
 #[derive(Copy, Clone)]
 pub enum KeyCase {
     Upper,
     Lower,
 }
 
+impl KeyCase {
+    /// Constructs a new `KeyCase`.
+    pub fn new(upper: bool) -> KeyCase {
+        if upper {
+            KeyCase::Upper
+        } else {
+            KeyCase::Lower
+        }
+    }
+}
+
+/// This struct represents a keyboard event.
 pub struct KeyEvent {
     keycode: u8,
     kind: EventKind,
 }
 
 impl KeyEvent {
-    fn from_scancode(scancode: u8) -> Option<Self> {
+    /// Gets the keycode of the event.
+    pub fn keycode(&self) -> u8 {
+        self.keycode
+    }
+
+    /// Gets the kind of the event.
+    pub fn kind(&self) -> EventKind {
+        self.kind
+    }
+
+    /// Converts a scancode to a keyboard event.
+    pub fn from_scancode(scancode: u8) -> Option<Self> {
         match scancode {
             1...86 => Some(KeyEvent {
                 keycode: scancode,
@@ -202,32 +227,11 @@ impl KeyEvent {
         }
     }
 
+    /// Gets the ascii letter associated with the event's keycode.
     pub fn get_ascii(&self, case: KeyCase) -> u8 {
         match case {
             KeyCase::Upper => KEYMAP_UPPER[self.keycode as usize],
             KeyCase::Lower => KEYMAP_LOWER[self.keycode as usize],
         }
-    }
-
-    pub fn get_kind(&self) -> EventKind {
-        self.kind
-    }
-}
-
-pub struct Keyboard {
-    data: PhantomData<u8>,
-}
-
-impl Keyboard {
-    pub fn get() -> Self {
-        Self { data: PhantomData }
-    }
-
-    pub fn poll_event(&self) -> Option<KeyEvent> {
-        let scancode = unsafe {
-            0 as u8
-        };
-
-        KeyEvent::from_scancode(scancode)
     }
 }

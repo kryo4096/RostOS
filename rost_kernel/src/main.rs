@@ -102,11 +102,14 @@ pub extern "C" fn kernel_init() {
 
         time::set_interval(5000);
         gdt::init();
-        // intialize interrupts (IDT, PIC)
-        interrupt::init();
+        
+        
         fs::init();
         syscall::init();
         process::init();
+
+        // intialize interrupts (IDT, PIC)
+        interrupt::init();
     }
 }
 
@@ -115,8 +118,12 @@ use process::Process;
 #[no_mangle]
 pub extern "C" fn kernel_main() -> ! {
     unsafe {
+        // create and schedule the init process
         process::schedule(Process::create(b"/bin/init", vec![b'/']));
+        // activate multiprocessing 
         process::activate_scheduler();
+
+        // use kernel process as idle spin.
         loop {}
     }
 }

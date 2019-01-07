@@ -37,7 +37,8 @@ pub unsafe fn init() {
             as u64 as *const HandlerFunc),
     );
     IDT[0x20].set_handler_fn(handler::tick);
-    IDT[0x21].set_handler_fn(handler::keyboard);
+    IDT[0x21].set_handler_fn( *(&(handler::keyboard_handler as unsafe extern "C" fn()) as *const unsafe extern "C" fn()
+            as u64 as *const HandlerFunc));
 
     IDT.load();
 
@@ -46,7 +47,7 @@ pub unsafe fn init() {
     pic::unmask(0); //timer
     pic::unmask(1); //keyboard
 
-    signal::signal_bus().add_channel(0); // keyboard
+    signal::signal_bus().add_channel(1); // keyboard
 
     if !interrupts::are_enabled() {
         interrupts::enable();

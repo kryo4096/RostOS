@@ -4,3 +4,4 @@ disk.img
 **/*.dmp
 **/dump
 **/bin
+**/__pycache__

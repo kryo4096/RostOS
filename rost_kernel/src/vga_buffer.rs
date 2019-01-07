@@ -144,10 +144,10 @@ lazy_static! {
 #[doc(hidden)]
 pub fn _print(args: fmt::Arguments) {
     use core::fmt::Write;
-    without_interrupts(|| unsafe {
+    unsafe {
         WRITER.force_unlock();
         WRITER.lock().write_fmt(args).unwrap();
-    });
+    }
 }
 
 #[macro_export]
@@ -163,16 +163,3 @@ macro_rules! print {
 
 use consts::*;
 use x86_64::structures::paging::PageTableFlags;
-
-pub fn map_for_user() -> Result<(), ()> {
-    ::memory::map_to_address(
-        USER_VGA,
-        VGA_BUFFER_PADDR,
-        PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
-    );
-    Ok(())
-}
-
-pub fn unmap_for_user() {
-    ::memory::unmap(USER_VGA);
-}

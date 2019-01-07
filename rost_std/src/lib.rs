@@ -25,6 +25,6 @@ pub fn panic(
 
     kprintln!("Panic! \n {:?}", panic_info);
     
-    loop {}
+    process::exit();
 }
 

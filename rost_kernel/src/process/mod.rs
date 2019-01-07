@@ -68,12 +68,12 @@ pub fn init() {
         })),
     );
 
-    let syscall_stack_start = KERNEL_SYSCALL_STACK_START - 1;
-    let syscall_stack_end = KERNEL_SYSCALL_STACK_START;
+    let syscall_stack_start = KERNEL_SYSCALL_STACK_START;
+    let syscall_stack_end = syscall_stack_start + KERNEL_SYSCALL_STACK_SIZE - 1;
 
     memory::map_range(
-        syscall_stack_end,
         syscall_stack_start,
+        syscall_stack_end,
         PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
     )
     .expect("Process::create(): failed to map user stack");
@@ -84,7 +84,7 @@ pub fn init() {
     );
 
     unsafe {
-        *(USER_KERNEL_STACK_PTR as *mut u64) = syscall_stack_start;
+        *(USER_KERNEL_STACK_PTR as *mut u64) = syscall_stack_end;
     }
 }
 
@@ -169,12 +169,12 @@ impl Process {
         .expect("Process::create(): failed to map user stack");
 
         let syscall_stack_start =
-            KERNEL_SYSCALL_STACK_START + KERNEL_SYSCALL_STACK_SIZE * (2 * pid + 1) - 1;
-        let syscall_stack_end = syscall_stack_start - KERNEL_SYSCALL_STACK_SIZE;
+            KERNEL_SYSCALL_STACK_START + (KERNEL_SYSCALL_STACK_SIZE + 0x1000) * pid;
+        let syscall_stack_end = syscall_stack_start + KERNEL_SYSCALL_STACK_SIZE - 1;
 
         memory::map_range(
-            syscall_stack_end,
             syscall_stack_start,
+            syscall_stack_end,
             PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
         )
         .expect("Process::create(): failed to map user stack");
@@ -191,7 +191,7 @@ impl Process {
             PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
         );
 
-        *(USER_KERNEL_STACK_PTR as *mut u64) = syscall_stack_start;
+        *(USER_KERNEL_STACK_PTR as *mut u64) = syscall_stack_end;
 
         let mut buf = Vec::new();
 
@@ -211,6 +211,7 @@ impl Process {
         process.push(0);
         process.push(0x200); //rflags INTERRUPTS ENABLED
 
+
         let process = Arc::new(RwLock::new(process));
 
         {
@@ -218,10 +219,9 @@ impl Process {
             list.insert(pid, Arc::clone(&process));
         }
 
-        {
-            let curr = Process::current();
-            memory::load_table(old_table);
-        }
+
+        let curr = Process::current();
+        memory::load_table(old_table);
 
         pid
     }
@@ -248,6 +248,15 @@ impl Process {
     pub fn get(pid: u64) -> Option<Arc<RwLock<Process>>> {
         processes().get(&pid).map(Arc::clone)
     }
+}
+
+use alloc::string::String;
+
+pub fn debug() {
+
+    let current = Process::current().clone();
+    let guard = current.read();
+    println!("{} (pid={})", String::from_utf8_lossy(&guard.name), guard.pid)
 }
 
 pub fn schedule(pid: u64) {
@@ -319,7 +328,7 @@ pub unsafe fn load_space(pid: u64) -> Option<u64> {
     if let Some(process) = Process::get(pid) {
         let old_pid = current_pid();
         memory::load_table(process.read().regs.cr3);
-
+        
         CURRENT_PID.store(pid, Ordering::SeqCst);
 
         Some(old_pid)

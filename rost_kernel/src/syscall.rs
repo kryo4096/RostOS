@@ -40,7 +40,6 @@ pub unsafe extern "C" fn __syscall(
 ) -> i64 {
     match rdi {
         0x0 => print(rsi, rdx),
-        0x1 => println(rsi, rdx), 
         0x2 => debug(rsi, rdx),
         0x10 => time(),
         0x20 => subscribe(rsi, rdx),
@@ -65,23 +64,12 @@ unsafe fn print(ptr: u64, len: u64) -> i64 {
     0
 }
 
-unsafe fn println(ptr: u64, len: u64) -> i64 {
-    let slice = core::slice::from_raw_parts(ptr as _, len as usize);
-    let s = core::str::from_utf8_unchecked(slice);
-    println!("{}", s);
-    0
-}
 
 use process::signal;
 
 pub unsafe fn add_channel(id: u64) -> i64 {
     let mut bus = signal::signal_bus();
-    if bus.has_channel(id) {
-        -1 
-    } else {
-        bus.add_channel(id);
-        0
-    }
+    bus.alloc_channel() as _
 }
 
 pub unsafe fn subscribe(channel: u64, handler_addr: u64) -> i64 {
@@ -127,6 +115,8 @@ unsafe fn execute(path_ptr: u64, path_len: u64) -> i64 {
         let pid = process::Process::create(&vec, current.read().cwd.clone());
 
         process::schedule(pid);
+
+
 
         pid as _
     } else {
