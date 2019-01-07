@@ -4,7 +4,7 @@ use consts::PAGE_SIZE;
 
 pub type MemoryMap = [MemoryRegion; 128];
 
-pub static mut MEMORY_MAP: MemoryMap= [MemoryRegion::EMPTY; 128];
+pub static mut MEMORY_MAP: MemoryMap = [MemoryRegion::EMPTY; 128];
 
 pub unsafe fn load() {
     let info = ::boot_info::get_info();

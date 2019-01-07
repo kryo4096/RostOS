@@ -1,10 +1,10 @@
 extern crate rand;
 
-use spin::{RwLock, Once};
-use self::rand::rngs::SmallRng;
 use self::rand::prelude::*;
+use self::rand::rngs::SmallRng;
+use spin::{Once, RwLock};
 
-static RNG : Once<RwLock<SmallRng>> = Once::new();
+static RNG: Once<RwLock<SmallRng>> = Once::new();
 
 pub fn random_int() -> i64 {
     let ret;

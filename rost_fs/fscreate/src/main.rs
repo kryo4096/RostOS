@@ -28,7 +28,7 @@ impl FileDisk {
             data: UnsafeCell::new(vec![[0; 4096]; block_count]),
         };
 
-        format(&fd, name).expect("disk form4atting failed");
+        format(&fd, name).expect("disk formatting failed");
 
         Ok(fd)
     }
@@ -86,7 +86,7 @@ fn main() {
     
     write(0, NodeHeader::DIRECTORY, &[], &mut tree);
 
-    println!("added /");;
+    //println!("added /");;
 
     for entry in WalkDir::new(root_path)
         .into_iter()
@@ -101,7 +101,10 @@ fn main() {
 
         let new_entry = create(
             &mut tree,
-            &path.to_str().unwrap().bytes().collect::<Vec<_>>(),
+            &path.to_str().unwrap().bytes().map(|c| match c {
+                b'\\'=>b'/',
+                _ => c,
+            }).collect::<Vec<_>>(),
             0,
         )
         .expect("failed to write file");
@@ -110,10 +113,10 @@ fn main() {
             let mut file = File::open(entry.path()).expect("failed to open file");
             let mut buf = Vec::new();
             file.read_to_end(&mut buf).expect("failed to read file");
-            println!("wrote to {}", entry.path().display());
+            //println!("wrote to {}", entry.path().display());
             write(new_entry, NodeHeader::FILE, &buf, &mut tree);
         } else if node_type.is_dir() {
-            println!("created {}", entry.path().display());
+            //println!("created {}", entry.path().display());
             write(new_entry, NodeHeader::DIRECTORY, &[], &mut tree);
         } else {
             panic!("invalid entry")
@@ -122,7 +125,9 @@ fn main() {
 
     let blocks_used = rost_fs::disk::block::get_root_block(&file_disk).top_block.index().expect("no root block found (impossible error)");
 
-    println!("Used ~{}% of image.", blocks_used as f64 / file_disk.block_count as f64 * 100.);
+    let fraction = blocks_used as f64 / file_disk.block_count as f64;
+    let total_size = file_disk.block_count as f64 * 4096.;
+    println!("Used ~{}% of image. ({}/{} MiB)", fraction * 100., total_size * fraction / 1000000., total_size / 1000000.);
 
     file_disk.save().expect("saving failed");
 }

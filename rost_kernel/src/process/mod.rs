@@ -1,19 +1,20 @@
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
-use alloc::sync::Arc;
 use alloc::collections::VecDeque;
+use alloc::sync::Arc;
+use alloc::vec::Vec;
+use consts::*;
 use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use fs::path;
+use fs::path::Path;
 use fs::NodeID;
 use memory;
 use spin::*;
-use x86_64::structures::paging::PageTable;
-use alloc::vec::Vec;
-use fs::path::Path;
 use x86_64::registers::control::{Cr3, Cr3Flags};
+use x86_64::structures::paging::PageTable;
 use x86_64::structures::paging::PageTableFlags;
-use fs::path;
-use consts::*;
 
+pub mod signal;
 
 static CTX_SWITCH_LOCK: AtomicBool = AtomicBool::new(true);
 
@@ -45,7 +46,6 @@ pub fn processes_mut() -> RwLockWriteGuard<'static, ProcessMap> {
     SCHEDULER.call_once(init_process_state).processes.write()
 }
 
-
 pub fn process_queue() -> RwLockWriteGuard<'static, ProcessQueue> {
     SCHEDULER.call_once(init_process_state).queue.write()
 }
@@ -53,37 +53,40 @@ pub fn process_queue() -> RwLockWriteGuard<'static, ProcessQueue> {
 use fs::path::SEPARATOR;
 
 pub fn init() {
-    processes_mut().insert(0, Arc::new(RwLock::new(Process {
-        pid: 0,
-        regs: Registers {
-            cr3: memory::translate(P4_TABLE_ADDR).unwrap(),
-            rsp: 0,
-        },
-        state: State::Running,
-        file_descriptors: Default::default(),
-        name: "KERNEL".into(),
-        cwd: vec!(SEPARATOR),
-    })));
+    processes_mut().insert(
+        0,
+        Arc::new(RwLock::new(Process {
+            pid: 0,
+            regs: Registers {
+                cr3: memory::translate(P4_TABLE_ADDR).unwrap(),
+                rsp: 0,
+            },
+            state: State::Running,
+            file_descriptors: Default::default(),
+            name: "IDLE".into(),
+            cwd: vec![SEPARATOR],
+        })),
+    );
 
-
-    let syscall_stack_start = KERNEL_SYSCALL_STACK_START - 1;
-    let syscall_stack_end = KERNEL_SYSCALL_STACK_START;
+    let syscall_stack_start = KERNEL_SYSCALL_STACK_START;
+    let syscall_stack_end = syscall_stack_start + KERNEL_SYSCALL_STACK_SIZE - 1;
 
     memory::map_range(
-        syscall_stack_end,
         syscall_stack_start,
+        syscall_stack_end,
         PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
-    ).expect("Process::create(): failed to map user stack");
+    )
+    .expect("Process::create(): failed to map user stack");
 
-    memory::map(USER_KERNEL_STACK_PTR,  PageTableFlags::PRESENT | PageTableFlags::WRITABLE);
+    memory::map(
+        USER_KERNEL_STACK_PTR,
+        PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
+    );
 
     unsafe {
-        *(USER_KERNEL_STACK_PTR as *mut u64) = syscall_stack_start;
+        *(USER_KERNEL_STACK_PTR as *mut u64) = syscall_stack_end;
     }
-
 }
-
-
 
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -96,7 +99,7 @@ impl Default for Registers {
     fn default() -> Self {
         Registers {
             cr3: 0,
-            rsp: 0 as _
+            rsp: 0 as _,
         }
     }
 }
@@ -112,15 +115,8 @@ pub struct NodeDescriptor {
 
 impl NodeDescriptor {
     fn new(kind: NDKind, node: NodeID) -> NodeDescriptor {
-        NodeDescriptor {
-            kind, node,
-        }
+        NodeDescriptor { kind, node }
     }
-}
-
-pub struct MemoryRegion {
-    start: u64,
-    end: u64,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -139,14 +135,12 @@ pub enum State {
 
 pub struct Process {
     pub pid: u64,
-    pub regs: Registers,
-    pub state: State,
-    pub file_descriptors: BTreeMap<u64, NodeDescriptor>,
     pub name: Vec<u8>,
+    pub state: State,
+    pub regs: Registers,
+    pub file_descriptors: BTreeMap<u64, NodeDescriptor>,
     pub cwd: Vec<u8>,
 }
-
-
 
 impl Process {
     /// Create a process from an elf file
@@ -171,20 +165,33 @@ impl Process {
             USER_STACK_TOP - USER_STACK_SIZE,
             USER_STACK_TOP,
             PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
-        ).expect("Process::create(): failed to map user stack");
+        )
+        .expect("Process::create(): failed to map user stack");
 
-        let syscall_stack_start = KERNEL_SYSCALL_STACK_START + KERNEL_SYSCALL_STACK_SIZE * (2*pid + 1)  - 1;
-        let syscall_stack_end =syscall_stack_start - KERNEL_SYSCALL_STACK_SIZE;
+        let syscall_stack_start =
+            KERNEL_SYSCALL_STACK_START + (KERNEL_SYSCALL_STACK_SIZE + 0x1000) * pid;
+        let syscall_stack_end = syscall_stack_start + KERNEL_SYSCALL_STACK_SIZE - 1;
 
         memory::map_range(
-            syscall_stack_end,
             syscall_stack_start,
+            syscall_stack_end,
             PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
-        ).expect("Process::create(): failed to map user stack");
+        )
+        .expect("Process::create(): failed to map user stack");
 
-        memory::map(USER_KERNEL_STACK_PTR,  PageTableFlags::PRESENT | PageTableFlags::WRITABLE);
+        memory::map_range(
+            USER_SIGNAL_STACK_TOP - USER_SIGNAL_STACK_SIZE,
+            USER_SIGNAL_STACK_TOP,
+            PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
+        )
+        .expect("Process::create(): failed to map user signal stack");
 
-        *(USER_KERNEL_STACK_PTR as *mut u64) = syscall_stack_start;
+        memory::map(
+            USER_KERNEL_STACK_PTR,
+            PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
+        );
+
+        *(USER_KERNEL_STACK_PTR as *mut u64) = syscall_stack_end;
 
         let mut buf = Vec::new();
 
@@ -204,6 +211,7 @@ impl Process {
         process.push(0);
         process.push(0x200); //rflags INTERRUPTS ENABLED
 
+
         let process = Arc::new(RwLock::new(process));
 
         {
@@ -211,22 +219,17 @@ impl Process {
             list.insert(pid, Arc::clone(&process));
         }
 
-        {
-            let curr = Process::current();
-            memory::load_table(old_table);
-        }
+
+        let curr = Process::current();
+        memory::load_table(old_table);
 
         pid
     }
 
     pub unsafe fn push(&mut self, value: u64) {
-
         self.regs.rsp -= core::mem::size_of::<u64>() as u64;
         *(self.regs.rsp as *mut u64) = value;
-
-
     }
-
 
     fn add_node_descriptor(&mut self, node: NodeID, id: u64) -> ::fs::FSResult<()> {
         let fd_kind = match ::fs::get_header(&mut *::fs::tree_mut(), node)? {
@@ -238,25 +241,33 @@ impl Process {
         Ok(())
     }
 
-    pub fn current() -> Arc<RwLock<Process>>{
+    pub fn current() -> Arc<RwLock<Process>> {
         processes().get(&current_pid()).expect("impossible").clone()
     }
 
     pub fn get(pid: u64) -> Option<Arc<RwLock<Process>>> {
         processes().get(&pid).map(Arc::clone)
     }
+}
 
+use alloc::string::String;
 
+pub fn debug() {
+
+    let current = Process::current().clone();
+    let guard = current.read();
+    println!("{} (pid={})", String::from_utf8_lossy(&guard.name), guard.pid)
 }
 
 pub fn schedule(pid: u64) {
     process_queue().push_front(pid);
-
 }
 
 pub fn activate_scheduler() {
     CTX_SWITCH_LOCK.store(false, Ordering::SeqCst);
 }
+
+use time;
 
 fn next_process() -> u64 {
     let mut queue = process_queue();
@@ -277,11 +288,17 @@ fn next_process() -> u64 {
                 queue.push_front(pid);
             }
 
+            if let State::Waiting(WaitReason::Timer(time)) = process.state {
+                if time::get() > time {
+                    process.state = State::Runnable;
+                }
+
+                queue.push_front(pid);
+            }
         }
     }
 
     panic!("no more processes");
-
 }
 
 pub unsafe fn wait(reason: WaitReason) {
@@ -293,18 +310,42 @@ pub unsafe fn wait(reason: WaitReason) {
     schedule(current_pid());
     let next_pid = next_process();
 
-
     switch_process(next_pid);
 }
 
-pub unsafe fn exit() -> ! {
+pub unsafe fn kill(pid: u64) {
+    if pid == current_pid() {
+        exit();
+    }
 
+    let mut queue = process_queue();
+    
+    queue.retain(|&p| p!=pid);
+
+}
+
+pub unsafe fn load_space(pid: u64) -> Option<u64> {
+    if let Some(process) = Process::get(pid) {
+        let old_pid = current_pid();
+        memory::load_table(process.read().regs.cr3);
+        
+        CURRENT_PID.store(pid, Ordering::SeqCst);
+
+        Some(old_pid)
+    } else {
+        None
+    }
+}
+
+pub unsafe fn exit() -> ! {
     {
         let mut current = Process::current();
         current.write().state = State::Exited;
     }
 
-    processes_mut().remove(&current_pid()).expect("failed to remove exited process!");
+    processes_mut()
+        .remove(&current_pid())
+        .expect("failed to remove exited process!");
 
     let next_pid = next_process();
 
@@ -315,11 +356,10 @@ pub unsafe fn exit() -> ! {
         let new_rsp = &to.read().regs.rsp;
         let new_cr3 = to.read().regs.cr3;
 
-        let mut x :u64 = 0;
+        let mut x: u64 = 0;
 
         (&mut x as _, new_rsp as _, new_cr3)
     };
-
 
     CURRENT_PID.store(next_pid, Ordering::SeqCst);
     switch_context(from, to, to_cr3);
@@ -338,12 +378,10 @@ pub unsafe fn update() {
         let pid = next_process();
 
         switch_process(pid);
-
     }
 }
 
 pub unsafe fn switch_process(pid: u64) {
-
     if pid == current_pid() {
         {
             let mut current = Process::current();
@@ -364,7 +402,6 @@ pub unsafe fn switch_process(pid: u64) {
 
         (old_rsp as _, new_rsp as _, new_cr3)
     };
-
 
     CURRENT_PID.store(pid, Ordering::SeqCst);
     switch_context(from, to, to_cr3);

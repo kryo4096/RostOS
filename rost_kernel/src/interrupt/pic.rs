@@ -102,7 +102,7 @@ pub fn mask_all() {
     for i in 0x0..0xf {
         c.mask(i);
     }
-}   
+}
 
 pub fn mask(irq: u8) {
     PIC_CHAIN.lock().mask(irq);
@@ -115,4 +115,3 @@ pub fn unmask(irq: u8) {
 pub unsafe fn send_eoi(irq: u8) {
     PIC_CHAIN.lock().send_eoi(irq);
 }
-

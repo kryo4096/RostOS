@@ -11,9 +11,5 @@
     "linker": "rust-lld",
     "panic-strategy": "abort",
     "disable-redzone": true,
-    "features": "-mmx,-sse,+soft-float",
-    "pre-link-args": {
-        "ld": ["-no-pie"]
-    },
-    "relocation-model": "dynamic-no-pic"
+    "features": "-mmx,-sse,+soft-float"
 }

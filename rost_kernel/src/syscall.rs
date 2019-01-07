@@ -1,6 +1,17 @@
 use memory;
 use x86_64::instructions::port::*;
 use x86_64::registers::model_specific::{Efer, EferFlags, Msr};
+use alloc::string::String;
+use alloc::vec::Vec;
+use fs;
+use fs::is_file;
+use fs::path::Path;
+use process::WaitReason;
+use process::{self, Process};
+use time;
+use consts::*;
+use x86_64::structures::paging::PageTableFlags;
+
 
 extern "C" {
     fn syscall_handler();
@@ -26,70 +37,74 @@ pub unsafe extern "C" fn __syscall(
     rcx: u64,
     r8: u64,
     r9: u64,
-) -> u64 {
+) -> i64 {
     match rdi {
         0x0 => print(rsi, rdx),
-        0x1 => println(rsi, rdx),
         0x2 => debug(rsi, rdx),
         0x10 => time(),
-        0x20 => read_scancode(),
+        0x20 => subscribe(rsi, rdx),
+        0x21 => add_channel(rsi),
+        0x22 => send(rsi, rdx, rcx, r8, r9),
         0x30 => get_pid(),
         0x31 => exit(),
         0x32 => execute(rsi, rdx),
         0x33 => wait_exit(rsi),
-        0x40 => map_vga(),
-        0x41 => unmap_vga(),
-        _ => panic!("Invalid syscall!"),
+        0x34 => wait_time(rsi),
+        0x35 => kill(rsi),
+        0x50 => vmap(rsi, rdx),
+        0x51 => pmap(rsi, rdx),
+        _ => process::exit(),
     }
 }
 
-unsafe fn read_scancode() -> u64 {
-    if let Some(scancode) = ::keyboard::pop_scancode() {
-        scancode as _
-    } else {
-        0x0
-    }
-}
-
-unsafe fn print(ptr: u64, len: u64) -> u64 {
+unsafe fn print(ptr: u64, len: u64) -> i64 {
     let slice = core::slice::from_raw_parts(ptr as _, len as usize);
     let s = core::str::from_utf8_unchecked(slice);
     print!("{}", s);
     0
 }
 
-unsafe fn println(ptr: u64, len: u64) -> u64 {
-    let slice = core::slice::from_raw_parts(ptr as _, len as usize);
-    let s = core::str::from_utf8_unchecked(slice);
-    println!("{}", s);
-    0
+
+use process::signal;
+
+pub unsafe fn add_channel(id: u64) -> i64 {
+    let mut bus = signal::signal_bus();
+    bus.alloc_channel() as _
 }
 
-unsafe fn get_pid() -> u64 {
-    ::process::current_pid()
+pub unsafe fn subscribe(channel: u64, handler_addr: u64) -> i64 {
+    if signal::signal_bus().subscribe(channel, process::current_pid(), handler_addr).is_some() {
+        0 
+    } else {
+        -1
+    }
 }
 
-unsafe fn exit() -> u64 {
+pub unsafe fn send(channel: u64, arg0: u64, arg1: u64, arg2: u64, arg3: u64) -> i64 {
+    if signal::signal_bus().call(channel, arg0,arg1,arg2,arg3).is_some() {
+        0 
+    } else {
+        -1
+    }
+}
+
+unsafe fn get_pid() -> i64 {
+    ::process::current_pid() as _ 
+}
+
+unsafe fn exit() -> i64 {
     ::process::exit();
     0
 }
 
-use alloc::string::String;
-use alloc::vec::Vec;
-use fs;
-use fs::is_file;
-use fs::path::Path;
-
-use process::{self, Process};
-
-unsafe fn execute(path_ptr: u64, path_len: u64) -> u64 {
+unsafe fn execute(path_ptr: u64, path_len: u64) -> i64 {
     let path = core::slice::from_raw_parts(path_ptr as _, path_len as _);
 
-    let node = fs::open(&mut * fs::tree_mut(), path,  0);
+    let node = fs::open(&mut *fs::tree_mut(), path, 0);
 
     let node = match node {
         Ok(node) => node,
-        _ => return 0,
+        _ => return -1,
     };
 
     if is_file(&mut *fs::tree_mut(), node).is_ok() {
@@ -101,45 +116,71 @@ unsafe fn execute(path_ptr: u64, path_len: u64) -> u64 {
 
         process::schedule(pid);
 
-        pid
+
+
+        pid as _
     } else {
-        0
+        -1
     }
 }
 
-unsafe fn wait_exit(pid: u64) -> u64 {
+
+unsafe fn wait_exit(pid: u64) -> i64 {
     process::wait(::process::WaitReason::ProcessExit(pid));
     0
 }
 
-unsafe fn debug(num: u64, f: u64) -> u64 {
+unsafe fn wait_time(ticks: u64) -> i64 {
+    process::wait(WaitReason::Timer(time::get() + ticks));
+    0
+}
+
+unsafe fn kill(pid: u64) -> i64 {
+    process::kill(pid);
+    0
+}
+
+unsafe fn debug(num: u64, f: u64) -> i64 {
     match f {
         0 => print!("0b{:b}", num),
         1 => print!("0o{:o}", num),
         2 => print!("{}", num),
         3 => print!("0x{:x}", num),
-
         _ => return (-1) as _,
     }
     0
 }
 
-unsafe fn time() -> u64 {
-    ::time::get()
+unsafe fn time() -> i64 {
+    time::get() as _
 }
 
-use consts::*;
-use x86_64::structures::paging::PageTableFlags;
 
-unsafe fn map_vga() -> u64 {
-    if ::vga_buffer::map_for_user().is_ok() {
-        USER_VGA
-    } else {
-        0
+unsafe fn vmap(start: u64, end: u64) -> i64 {
+
+    if start >= 256 * P4_ENTRY_SIZE || end >= 256 * P4_ENTRY_SIZE {
+        return -1;
     }
+
+    memory::map_range_all(
+        start,
+        end,
+        PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
+    );
+    0
 }
 
-unsafe fn unmap_vga() -> u64 {
-    ::vga_buffer::unmap_for_user();
+unsafe fn pmap(virt: u64, phys: u64) -> i64 {
+
+    if virt >= 256 * P4_ENTRY_SIZE {
+        return -1;
+    }
+
+    memory::map_to_address(
+        virt,
+        phys,
+        PageTableFlags::PRESENT | PageTableFlags::WRITABLE,
+    );
+
     0
 }

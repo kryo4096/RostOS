@@ -9,5 +9,6 @@
         "process.h": "c",
         "std.h": "c",
         "stdbool.h": "c"
-    }
+    },
+    "python.pythonPath": "C:\\Users\\Jonas\\AppData\\Local\\Programs\\Python\\Python37-32\\python.exe"
 }

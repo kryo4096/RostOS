@@ -52,7 +52,10 @@ impl FrameStackAllocator {
     }
 
     fn first_free_region(&self) -> Option<u64> {
-        self.memory_map.iter().position(MemoryRegion::is_free).map(|x|x as u64)
+        self.memory_map
+            .iter()
+            .position(MemoryRegion::is_free)
+            .map(|x| x as u64)
     }
 
     fn r_index(&mut self) -> u64 {
@@ -66,10 +69,10 @@ impl FrameStackAllocator {
 
     fn c_region(&mut self) -> &mut MemoryRegion {
         &mut self.memory_map[self.r_index() as usize]
-    } 
+    }
     fn p_region(&mut self) -> &mut MemoryRegion {
         &mut self.memory_map[self.r_index() as usize - 1]
-    } 
+    }
 }
 
 impl FrameAllocator<Size4KiB> for FrameStackAllocator {
