@@ -5,3 +5,5 @@ disk.img
 **/dump
 **/bin
 **/__pycache__
+**/Cargo.lock
+**/cargo.lock
