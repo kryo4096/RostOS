@@ -4,7 +4,6 @@
     const_fn,
     global_asm,
     abi_x86_interrupt,
-    integer_atomics,
     asm,
     alloc,
     alloc_error_handler,
