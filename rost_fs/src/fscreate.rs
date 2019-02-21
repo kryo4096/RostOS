@@ -1,8 +1,8 @@
 use rost_fs::disk::block::Block;
 use rost_fs::disk::format;
 use rost_fs::disk::{Disk, DiskAddress};
-use rost_fs::node::*;
 use rost_fs::fs::*;
+use rost_fs::node::*;
 
 use std::cell::UnsafeCell;
 use std::env;
@@ -78,12 +78,13 @@ fn main() {
 
     let root_path = args.get(3).expect("root path missing");
 
-    let mut file_disk = FileDisk::new(image_path, size, b"TEST DISK").expect("disk creation failed");
+    let mut file_disk =
+        FileDisk::new(image_path, size, b"TEST DISK").expect("disk creation failed");
 
     let mut tree = NodeTree::new(&mut file_disk);
 
     tree.insert_node(0).expect("inserting root dir failed");
-    
+
     write(0, NodeHeader::DIRECTORY, &[], &mut tree);
 
     println!("added /");;
@@ -120,9 +121,15 @@ fn main() {
         }
     }
 
-    let blocks_used = rost_fs::disk::block::get_root_block(&file_disk).top_block.index().expect("no root block found (impossible error)");
+    let blocks_used = rost_fs::disk::block::get_root_block(&file_disk)
+        .top_block
+        .index()
+        .expect("no root block found (impossible error)");
 
-    println!("Used ~{}% of image.", blocks_used as f64 / file_disk.block_count as f64 * 100.);
+    println!(
+        "Used ~{}% of image.",
+        blocks_used as f64 / file_disk.block_count as f64 * 100.
+    );
 
     file_disk.save().expect("saving failed");
 }

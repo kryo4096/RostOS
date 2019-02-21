@@ -1,5 +1,4 @@
-///! This module contains procedures to interpret the data supplied by the keyboard signal. 
-
+///! This module contains procedures to interpret the data supplied by the keyboard signal.
 use crate::ascii;
 
 const KEYMAP_LOWER: [u8; 87] = [
@@ -99,6 +98,12 @@ const KEYMAP_UPPER: [u8; 87] = [
     b'M', b';', b':', b'_', 0, 0, 0, b' ', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 ];
+
+const PRESS_START: u8 = 0;
+const PRESS_END: u8 = PRESS_START + 86;
+
+const RELEASE_START: u8 = 0x80;
+const RELEASE_END: u8 = RELEASE_START + 86;
 
 pub use self::scancodes::*;
 
@@ -215,11 +220,11 @@ impl KeyEvent {
     /// Converts a scancode to a keyboard event.
     pub fn from_scancode(scancode: u8) -> Option<Self> {
         match scancode {
-            1...86 => Some(KeyEvent {
+            PRESS_START...PRESS_END => Some(KeyEvent {
                 keycode: scancode,
                 kind: EventKind::Press,
             }),
-            0x81...204 => Some(KeyEvent {
+            RELEASE_START...RELEASE_END => Some(KeyEvent {
                 keycode: scancode - 0x80,
                 kind: EventKind::Release,
             }),

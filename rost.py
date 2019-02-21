@@ -5,7 +5,7 @@ import os
 import sys
 
 QEMU_CMD = ["qemu-system-x86_64"]
-QEMU_ARGS = ["-m", "2G", "-monitor", "stdio"]
+QEMU_ARGS = ["-m", "2G", "-monitor", "stdio","-device", "isa-debug-exit,iobase=0xf4,iosize=0x04"]
 QEMU_VT_ARGS_LINUX =  ["-enable-kvm", "-machine", "q35,accel=kvm", "-device", "intel-iommu"] 
 QEMU_VT_ARGS_WINDOWS =  ["-enable-kvm", "-machine", "q35,accel=hax"] 
 

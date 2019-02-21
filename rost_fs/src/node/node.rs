@@ -99,18 +99,14 @@ pub fn copy_data_slice(
     Ok(())
 }
 
-pub fn write_data(
-    disk: &impl Disk,
-    node_addr: DiskAddress,
-    data: &[u8],
-) -> Result<(), NoneError> {
+pub fn write_data(disk: &impl Disk, node_addr: DiskAddress, data: &[u8]) -> Result<(), NoneError> {
     let node = get_node(disk, node_addr)?;
 
     if node.data_start.is_null() {
         node.data_start = block::allocate_block(disk)?;
         block::get_data_block(disk, node.data_start)?.next_block = DiskAddress::NULL;
     }
-    
+
     block::write_to_data_block(disk, node.data_start, data);
 
     node.data_size = data.len() as u64;
@@ -137,7 +133,7 @@ pub fn allocate_node(disk: &impl Disk) -> Option<DiskAddress> {
 
         if node_block.is_null() {
             node_block = block::allocate_block(disk)?;
-            
+
             block::get_node_block(disk, node_block)?.used_nodes = 0;
             block::get_node_block(disk, node_block)?.nodes = [Node::EMPTY; 96];
             block::get_root_block(disk).current_node_block = node_block;

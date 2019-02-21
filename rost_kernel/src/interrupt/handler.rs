@@ -1,10 +1,10 @@
 use alloc::string::String;
 use consts::*;
+use process::{self, signal};
 use x86_64::instructions::port::Port;
 use x86_64::structures::idt::ExceptionStackFrame;
 use x86_64::structures::idt::PageFaultErrorCode;
 use x86_64::VirtAddr;
-use process::{self, signal};
 
 pub extern "x86-interrupt" fn breakpoint(frame: &mut ExceptionStackFrame) {
     println!(
@@ -21,14 +21,10 @@ pub extern "x86-interrupt" fn page_fault(
     {
         let current = ::process::Process::current();
 
-        println!(
-            "EXCEPTION: PAGE FAULT\n{:#?}\n{:#?}",
-            frame,
-            pcode
-        );
+        println!("EXCEPTION: PAGE FAULT\n{:#?}\n{:#?}", frame, pcode);
     }
 
-    let addr : u64;
+    let addr: u64;
 
     unsafe {
         asm!("mov $0, cr2" : "=r"(addr) ::: "intel");
@@ -171,8 +167,6 @@ pub fn syscall() {
 }
 */
 
-
-
 pub extern "x86-interrupt" fn tick(frame: &mut ExceptionStackFrame) {
     unsafe {
         ::time::tick();
@@ -181,14 +175,12 @@ pub extern "x86-interrupt" fn tick(frame: &mut ExceptionStackFrame) {
     }
 }
 
-
 #[no_mangle]
 pub extern "C" fn __keyboard() {
     let port = Port::new(KB_DATA_PORT);
     unsafe {
-        
         let scancode: u8 = port.read();
-        signal::signal_bus().call(1, scancode as _, 0,0,0);
+        signal::signal_bus().call(1, scancode as _, 0, 0, 0);
         ::interrupt::send_eoi(1);
     }
 }

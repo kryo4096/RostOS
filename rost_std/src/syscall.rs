@@ -9,7 +9,7 @@ pub const SYS_GET_TIME: u64 = 0x10;
 /// This system call registers a handler function with a signal.
 pub const SYS_SUBSCRIBE: u64 = 0x20;
 
-/// This system call creates a new signal channel. 
+/// This system call creates a new signal channel.
 pub const SYS_ADD_CHANNEL: u64 = 0x21;
 
 /// This system call sends a message on a channel.
@@ -39,14 +39,15 @@ pub const SYS_VMAP: u64 = 0x50;
 /// This system call maps virtual memory to specified frames.
 pub const SYS_PMAP: u64 = 0x51;
 
-
-global_asm!("
+global_asm!(
+    "
 .global _syscall
 
 _syscall:
     int $0x80
     ret
-");
+"
+);
 
 extern "C" {
     /// This function performs the actual system call.
@@ -55,10 +56,24 @@ extern "C" {
 
 #[macro_export]
 macro_rules! syscall {
-    ($rdi:expr)                                                         => (crate::syscall::_syscall($rdi as _,0,0,0,0,0));
-    ($rdi:expr, $rsi:expr)                                              => (crate::syscall::_syscall($rdi as _,$rsi as _,0,0,0,0));
-    ($rdi:expr, $rsi:expr, $rdx:expr)                                   => (crate::syscall::_syscall($rdi as _,$rsi as _,$rdx as _,0,0,0));
-    ($rdi:expr, $rsi:expr, $rdx:expr, $rcx:expr)                        => (crate::syscall::_syscall($rdi as _,$rsi as _,$rdx as _,$rcx as _,0,0));
-    ($rdi:expr, $rsi:expr, $rdx:expr, $rcx:expr, $r8:expr)              => (crate::syscall::_syscall($rdi as _,$rsi as _,$rdx as _,$rcx as _,$r8 as _,0));
-    ($rdi:expr, $rsi:expr, $rdx:expr, $rcx:expr, $r8:expr, $r9:expr)    => (crate::syscall::_syscall($rdi as _,$rsi as _,$rdx as _,$rcx as _,$r8 as _,$r9 as _));
+    ($rdi:expr) => {
+        crate::syscall::_syscall($rdi as _, 0, 0, 0, 0, 0)
+    };
+    ($rdi:expr, $rsi:expr) => {
+        crate::syscall::_syscall($rdi as _, $rsi as _, 0, 0, 0, 0)
+    };
+    ($rdi:expr, $rsi:expr, $rdx:expr) => {
+        crate::syscall::_syscall($rdi as _, $rsi as _, $rdx as _, 0, 0, 0)
+    };
+    ($rdi:expr, $rsi:expr, $rdx:expr, $rcx:expr) => {
+        crate::syscall::_syscall($rdi as _, $rsi as _, $rdx as _, $rcx as _, 0, 0)
+    };
+    ($rdi:expr, $rsi:expr, $rdx:expr, $rcx:expr, $r8:expr) => {
+        crate::syscall::_syscall($rdi as _, $rsi as _, $rdx as _, $rcx as _, $r8 as _, 0)
+    };
+    ($rdi:expr, $rsi:expr, $rdx:expr, $rcx:expr, $r8:expr, $r9:expr) => {
+        crate::syscall::_syscall(
+            $rdi as _, $rsi as _, $rdx as _, $rcx as _, $r8 as _, $r9 as _,
+        )
+    };
 }

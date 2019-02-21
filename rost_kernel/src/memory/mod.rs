@@ -1,10 +1,10 @@
 use consts::*;
+use process;
 use spin::{Mutex, MutexGuard, Once};
 use x86_64::registers::control::{Cr3, Cr3Flags};
 use x86_64::structures::paging::*;
 use x86_64::ux::u9;
 use x86_64::{PhysAddr, VirtAddr};
-use process;
 
 pub mod frame_allocator;
 mod map;

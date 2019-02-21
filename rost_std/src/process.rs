@@ -10,8 +10,8 @@ pub struct Process {
 
 impl Process {
     /// Gets the process of a struct.
-    pub fn pid(&self) -> u64 { 
-        self.pid 
+    pub fn pid(&self) -> u64 {
+        self.pid
     }
 
     /// Waits for the process to quit. If the process never quits the current process is lost.
@@ -31,32 +31,23 @@ impl Process {
 
 /// Gets the current process.
 pub fn current() -> Process {
-    let pid = unsafe {
-        syscall!(SYS_PROCESS_GETPID)
-    };
+    let pid = unsafe { syscall!(SYS_PROCESS_GETPID) };
 
-    Process {
-        pid
-    }
+    Process { pid }
 }
-
 
 /// Executes an elf file located at `elf_path`, returning its PID if execution was successful
 pub fn execute(elf_path: &[u8]) -> Option<Process> {
-    let pid = unsafe {
-        syscall!(SYS_PROCESS_EXECUTE, elf_path.as_ptr(), elf_path.len())
-    };
+    let pid = unsafe { syscall!(SYS_PROCESS_EXECUTE, elf_path.as_ptr(), elf_path.len()) };
 
-    if pid == -1 as _{
+    if pid == -1 as _ {
         None
     } else {
-        Some(Process {
-            pid
-        })
+        Some(Process { pid })
     }
 }
 
-/// Sleeps for the specified amount of ticks. 
+/// Sleeps for the specified amount of ticks.
 pub fn sleep(ticks: u64) {
     unsafe {
         syscall!(SYS_PROCESS_SLEEP, ticks);
@@ -72,3 +63,11 @@ pub fn exit() -> ! {
     unreachable!();
 }
 
+/// Idles the current process, making only its signal handlers function.
+pub fn idle() -> ! {
+    unsafe {
+        syscall!(SYS_PROCESS_WAIT, 0);
+    }
+
+    unreachable!();
+}

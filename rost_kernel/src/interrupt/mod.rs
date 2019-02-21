@@ -37,8 +37,10 @@ pub unsafe fn init() {
             as u64 as *const HandlerFunc),
     );
     IDT[0x20].set_handler_fn(handler::tick);
-    IDT[0x21].set_handler_fn( *(&(handler::keyboard_handler as unsafe extern "C" fn()) as *const unsafe extern "C" fn()
-            as u64 as *const HandlerFunc));
+    IDT[0x21].set_handler_fn(
+        *(&(handler::keyboard_handler as unsafe extern "C" fn()) as *const unsafe extern "C" fn()
+            as u64 as *const HandlerFunc),
+    );
 
     IDT.load();
 

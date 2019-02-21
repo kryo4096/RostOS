@@ -12,6 +12,8 @@ use rost_std::keyboard;
 use rost_std::keyboard::{KeyEvent, EventKind, KeyCase};
 use rost_std::debug;
 use rost_std::process;
+use rost_std::process::Process;
+use rost_std::misc::atoi;
 
 use rost_std::ascii::BACKSPACE;
 
@@ -52,6 +54,7 @@ extern "C" fn keyboard_handler(scancode: u64, _: u64, _:u64,_:u64) {
             } 
         }
     }
+    update_cursor();
 }
 
 pub struct TerminalBuf {
@@ -153,33 +156,96 @@ impl TerminalBuf {
     }
 }
 
+enum ShellError {
+    CommandNotFound,
+}
+
+type ShellResult<T> = Result<T, ShellError>;
+
+fn execute_command(cmd: &[u8]) -> ShellResult<Process> {
+    let mut line = [0; 84];
+    
+    (&mut line[..4]).copy_from_slice(b"bin/");
+    (&mut line[4..cmd.len() + 4]).copy_from_slice(cmd);
+
+    process::execute(&line[0..cmd.len() + 4]).ok_or(ShellError::CommandNotFound)
+}
+
+fn poll_line(line: &mut [u8]) -> &[u8] {
+    loop {
+        match TERMINAL_BUFFER.get_line(line) {
+            Some(len) => break &line[0..len],
+            None => (),
+        }
+    }
+}
+
+fn update_cursor() {
+    vga::set_cursor(TERMINAL_BUFFER.cursor.load(Ordering::SeqCst).min(VGA_WIDTH - 1), 24);
+}
+
+fn clear() {
+    TERMINAL_BUFFER.cursor.store(0, Ordering::SeqCst);
+    vga::clear();
+    update_cursor();
+}
+
+fn prompt() {
+    TERMINAL_BUFFER.print_ascii(b"> ");
+    update_cursor();
+}
+
 #[no_mangle]
 #[start]
 pub extern "C" fn _start() {
     vga::map();
     signal::subscribe(signal::SIGNAL_KEYBOARD, keyboard_handler);
-
-    TERMINAL_BUFFER.print_ascii(b"Welcome to RostOS!\n");
     loop {
-        TERMINAL_BUFFER.print_ascii(b"> ");
-        let mut line = [0; 84];
-        
-        let mut len = loop {
-            match TERMINAL_BUFFER.get_line(&mut line[4..]) {
-                Some(len) => break len,
-                None => (),
-            }
+        prompt();
+        let mut line = [0; 80];
+        let line = poll_line(&mut line);
+
+        let split = line.iter().position(|b| *b==b' ');
+
+        let mut cmd : &[u8];
+        let arg = if split.is_some() && line.len() - split.unwrap() > 0 {
+            cmd = &line[..split.unwrap()];
+            Some(&line[split.unwrap() + 1..])
+        } else {
+            cmd = line;
+            None
         };
 
-        (&mut line[0..4]).copy_from_slice(b"bin/");
-        if let Some(p) = process::execute(&line[0..len + 4]) {
-            p.wait()
-        } else {
-            TERMINAL_BUFFER.print_ascii(b"Command not found: ");
-            TERMINAL_BUFFER.print_ascii(&line[..len + 4]);
-            TERMINAL_BUFFER.new_line();
+        let mut bg = false;
+
+        if cmd.len() > 1 && *cmd.get(0).unwrap() == b'&' {
+            bg = true;
+            cmd = &cmd[1..]
         }
 
+        match cmd {
+            b"exit" => process::exit(),
+            b"clear" => clear(),
+            b"sleep" => {
+                if let Some(arg) = arg {
+                    process::sleep(atoi(arg) as u64);
+                } else {
+                    TERMINAL_BUFFER.print_ascii(b"Command requires argument!");
+                } 
+            },
+            _ => match execute_command(cmd) {
+                Ok(proc) => {
+                    if !bg {
+                         proc.wait()
+                    }
+                },
+                Err(ShellError::CommandNotFound) => {
+                    TERMINAL_BUFFER.print_ascii(b"Command not found: ");
+                    TERMINAL_BUFFER.print_ascii(cmd);
+                    TERMINAL_BUFFER.new_line();  
+                },
+            },
+        }
     }
     
 }

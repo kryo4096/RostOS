@@ -1,4 +1,3 @@
-
 use core::cell::UnsafeCell;
 
 use crate::disk::block::{self, Block};
@@ -16,7 +15,7 @@ impl DebugDisk {
     pub fn new(size: u64) -> Self {
         Self {
             blocks: UnsafeCell::new(vec![[0; 4096]; size as usize]),
-            size
+            size,
         }
     }
 }
@@ -112,7 +111,6 @@ fn tree_test() {
     }
 }
 
-
 #[test]
 fn public_api_test() {
     let mut disk = DebugDisk::new(1024);
@@ -125,19 +123,17 @@ fn public_api_test() {
 
     assert_eq!(node, same_node, "found node not valid");
 
-    let data = include_bytes!("test.bin"); 
+    let data = include_bytes!("test.bin");
 
     node.write_data(data).expect("writing failed");
 
-    let mut buf = vec!();
+    let mut buf = vec![];
 
     node.read_data(&mut buf).expect("reading failed");
 
     assert_eq!(data.len(), buf.len());
 
-    for index in 0 .. buf.len() {
+    for index in 0..buf.len() {
         assert_eq!(data[index], buf[index], "data corrupted at {}", index);
     }
-
 }
-

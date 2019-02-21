@@ -1,9 +1,9 @@
 // Code from https://github.com/phil-opp/blog_os
 
 use lazy_static::lazy_static;
+use x86_64::structures::gdt::{Descriptor, GlobalDescriptorTable, SegmentSelector};
 use x86_64::structures::tss::TaskStateSegment;
 use x86_64::VirtAddr;
-use x86_64::structures::gdt::{Descriptor, GlobalDescriptorTable, SegmentSelector};
 
 pub const DOUBLE_FAULT_IST_INDEX: u16 = 0;
 
@@ -22,8 +22,6 @@ lazy_static! {
         tss
     };
 }
-
-
 
 pub fn init() {
     use x86_64::instructions::segmentation::set_cs;

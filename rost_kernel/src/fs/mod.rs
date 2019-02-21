@@ -18,7 +18,6 @@ fn create_tree() -> RwLock<NodeTree<'static, RamDisk>> {
     unsafe { RwLock::new(NodeTree::new(&mut DISK)) }
 }
 
-
 pub fn tree() -> RwLockReadGuard<'static, NodeTree<'static, RamDisk>> {
     NODE_TREE.call_once(create_tree).read()
 }

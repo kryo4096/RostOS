@@ -7,6 +7,7 @@ use consts::*;
 use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use fs::path;
 use fs::path::Path;
+use fs::path::SEPARATOR;
 use fs::NodeID;
 use memory;
 use spin::*;
@@ -31,7 +32,7 @@ pub struct Scheduler {
     queue: RwLock<ProcessQueue>,
 }
 
-pub fn init_process_state() -> Scheduler {
+pub fn init_scheduler() -> Scheduler {
     Scheduler {
         processes: RwLock::new(BTreeMap::new()),
         queue: RwLock::new(VecDeque::new()),
@@ -39,18 +40,16 @@ pub fn init_process_state() -> Scheduler {
 }
 
 pub fn processes() -> RwLockReadGuard<'static, ProcessMap> {
-    SCHEDULER.call_once(init_process_state).processes.read()
+    SCHEDULER.call_once(init_scheduler).processes.read()
 }
 
 pub fn processes_mut() -> RwLockWriteGuard<'static, ProcessMap> {
-    SCHEDULER.call_once(init_process_state).processes.write()
+    SCHEDULER.call_once(init_scheduler).processes.write()
 }
 
 pub fn process_queue() -> RwLockWriteGuard<'static, ProcessQueue> {
-    SCHEDULER.call_once(init_process_state).queue.write()
+    SCHEDULER.call_once(init_scheduler).queue.write()
 }
-
-use fs::path::SEPARATOR;
 
 pub fn init() {
     processes_mut().insert(
@@ -202,15 +201,14 @@ impl Process {
 
         let info = ::elf::load_elf(&mut buf).expect("Process::create(): failed to load executable");
 
-        process.push(info.entry_point); // ret
-        process.push(0);
-        process.push(0);
-        process.push(0);
-        process.push(0);
-        process.push(0);
-        process.push(0);
-        process.push(0x200); //rflags INTERRUPTS ENABLED
-
+        process.push_to_stack(info.entry_point); //rip
+        process.push_to_stack(0); //rbx
+        process.push_to_stack(0); //rbp
+        process.push_to_stack(0); //r12
+        process.push_to_stack(0); //r13
+        process.push_to_stack(0); //r14
+        process.push_to_stack(0); //r15
+        process.push_to_stack(0x200); //rflags INTERRUPTS ENABLED
 
         let process = Arc::new(RwLock::new(process));
 
@@ -219,14 +217,13 @@ impl Process {
             list.insert(pid, Arc::clone(&process));
         }
 
-
         let curr = Process::current();
         memory::load_table(old_table);
 
         pid
     }
 
-    pub unsafe fn push(&mut self, value: u64) {
+    pub unsafe fn push_to_stack(&mut self, value: u64) {
         self.regs.rsp -= core::mem::size_of::<u64>() as u64;
         *(self.regs.rsp as *mut u64) = value;
     }
@@ -253,10 +250,13 @@ impl Process {
 use alloc::string::String;
 
 pub fn debug() {
-
     let current = Process::current().clone();
     let guard = current.read();
-    println!("{} (pid={})", String::from_utf8_lossy(&guard.name), guard.pid)
+    println!(
+        "{} (pid={})",
+        String::from_utf8_lossy(&guard.name),
+        guard.pid
+    )
 }
 
 pub fn schedule(pid: u64) {
@@ -319,16 +319,15 @@ pub unsafe fn kill(pid: u64) {
     }
 
     let mut queue = process_queue();
-    
-    queue.retain(|&p| p!=pid);
 
+    queue.retain(|&p| p != pid);
 }
 
 pub unsafe fn load_space(pid: u64) -> Option<u64> {
     if let Some(process) = Process::get(pid) {
         let old_pid = current_pid();
         memory::load_table(process.read().regs.cr3);
-        
+
         CURRENT_PID.store(pid, Ordering::SeqCst);
 
         Some(old_pid)

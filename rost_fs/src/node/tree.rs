@@ -2,8 +2,8 @@ use core::cmp::Ord;
 use core::cmp::Ordering::*;
 use core::option::NoneError;
 
-use crate::disk::*;
 use super::node::{self, Node};
+use crate::disk::*;
 
 pub fn search_node(disk: &impl Disk, key: i64) -> Option<DiskAddress> {
     let mut current_node = block::get_root_block(disk).root_node;
@@ -29,14 +29,12 @@ pub fn search_node(disk: &impl Disk, key: i64) -> Option<DiskAddress> {
 
 /// Returns true if insertion occured, false if node already exists
 pub fn insert_node(disk: &impl Disk, key: i64) -> Result<DiskAddress, NoneError> {
-    
-
     if block::get_root_block(disk).root_node.is_null() {
         let addr = node::allocate_node(disk)?;
         *node::get_node(disk, addr)? = Node { key, ..Node::EMPTY };
         block::get_root_block(disk).root_node = addr;
 
-        return Ok(addr)
+        return Ok(addr);
     }
 
     let mut current_node = block::get_root_block(disk).root_node;

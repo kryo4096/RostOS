@@ -9,6 +9,8 @@ extern crate rost_std;
 use rost_std::process;
 use rost_std::signal;
 use rost_std::vga;
+#[macro_use]
+use rost_std::debug;
 
 use core::sync::atomic::*;
 
@@ -16,7 +18,9 @@ use core::sync::atomic::*;
 #[start]
 #[no_mangle]
 fn _start() {
-    let p = process::execute(b"/bin/terminal").unwrap();
-    p.wait();
-    process::exit();
+    process::execute(b"/bin/logo").unwrap().wait();
+    loop {
+        process::execute(b"/bin/shell").unwrap().wait();
+        kprintln!("Tried to kill init shell!");
+    }
 }

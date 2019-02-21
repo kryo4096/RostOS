@@ -34,7 +34,6 @@ impl NodeHeader {
     pub const FILE: NodeHeader = NodeHeader { node_type: 0 };
 }
 
-
 pub const NODEHDR_SIZE: usize = core::mem::size_of::<NodeHeader>();
 
 #[derive(Debug)]
@@ -65,7 +64,7 @@ pub fn get_header(tree: &mut NodeTree<impl Disk>, id: NodeID) -> FSResult<NodeHe
 }
 
 pub fn get_content(tree: &mut NodeTree<impl Disk>, id: NodeID, buf: &mut Vec<u8>) -> FSResult<()> {
-    let node = tree.search_node(id).map_err(|_| FSError::InvalidHdr)?; 
+    let node = tree.search_node(id).map_err(|_| FSError::InvalidHdr)?;
     node.read_data_slice(
         buf,
         NODEHDR_SIZE as u64,
@@ -117,7 +116,9 @@ pub fn validate_name(name: &[u8]) -> FSResult<&[u8]> {
     if !name.contains(&b';') && !name.contains(&b'\n') && name.len() > 0 {
         Ok(name)
     } else {
-        Err(FSError::InvalidName(String::from_utf8_lossy(name).to_string()))
+        Err(FSError::InvalidName(
+            String::from_utf8_lossy(name).to_string(),
+        ))
     }
 }
 
@@ -151,7 +152,6 @@ pub fn add_child(
 
     get_content(tree, dir, &mut buf)?;
 
-    
     buf.extend(name.iter());
     buf.push(b';');
     buf.extend(unsafe { core::mem::transmute::<NodeID, [u8; 8]>(node).iter() });
@@ -162,26 +162,38 @@ pub fn add_child(
     Ok(())
 }
 
-pub fn list_children(tree: &mut NodeTree<impl Disk>, dir: NodeID) -> FSResult<Vec<(Vec<u8>, NodeID)>> {
+pub fn list_children(
+    tree: &mut NodeTree<impl Disk>,
+    dir: NodeID,
+) -> FSResult<Vec<(Vec<u8>, NodeID)>> {
     let mut buf = Vec::new();
     get_content(tree, dir, &mut buf)?;
 
-    let mut children = vec!();
+    let mut children = vec![];
 
     for line in buf.split(|&b| b == b'\n') {
         if line.len() < 1 {
             continue;
         }
-        
-        let (name, id) = {
-            let mut s = line.split(|&b| b==b';');
 
-            (s.next().ok_or(FSError::MalformedChild(String::from_utf8_lossy(line).into()))?, s.next().filter(|id| id.len()== 8).ok_or(FSError::MalformedChild(String::from_utf8_lossy(line).into()))?)
+        let (name, id) = {
+            let mut s = line.split(|&b| b == b';');
+
+            (
+                s.next().ok_or(FSError::MalformedChild(
+                    String::from_utf8_lossy(line).into(),
+                ))?,
+                s.next()
+                    .filter(|id| id.len() == 8)
+                    .ok_or(FSError::MalformedChild(
+                        String::from_utf8_lossy(line).into(),
+                    ))?,
+            )
         };
 
-        let id = unsafe {*(id.as_ptr() as *const NodeID)};
+        let id = unsafe { *(id.as_ptr() as *const NodeID) };
 
-        children.push((name.into(),id))
+        children.push((name.into(), id))
     }
 
     Ok(children)
@@ -199,7 +211,9 @@ pub fn get_child(tree: &mut NodeTree<impl Disk>, dir: NodeID, name: &[u8]) -> FS
         }
     }
 
-    Err(FSError::ChildMissing(String::from_utf8_lossy(name).to_string()))
+    Err(FSError::ChildMissing(
+        String::from_utf8_lossy(name).to_string(),
+    ))
 }
 
 pub fn create(tree: &mut NodeTree<impl Disk>, path: &[u8], from: NodeID) -> FSResult<NodeID> {

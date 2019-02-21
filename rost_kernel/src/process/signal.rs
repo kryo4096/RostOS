@@ -1,20 +1,27 @@
 use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
-use process;
-use process::{WaitReason, State, Process};
 use consts::USER_SIGNAL_STACK_TOP;
+use process;
+use process::{Process, State, WaitReason};
 
-use spin::{Once, Mutex, MutexGuard};
+use spin::{Mutex, MutexGuard, Once};
 
-static SIGNAL_BUS: Once<Mutex<SignalBus>> = Once::new(); 
+static SIGNAL_BUS: Once<Mutex<SignalBus>> = Once::new();
 
 pub fn signal_bus() -> MutexGuard<'static, SignalBus> {
-    SIGNAL_BUS.call_once(||Mutex::new(SignalBus::new())).lock()
+    SIGNAL_BUS.call_once(|| Mutex::new(SignalBus::new())).lock()
 }
 
 extern "C" {
-    fn _call_signal(arg0: u64, arg1: u64, arg2: u64, arg3: u64, handler_addr: u64, stack_pointer: u64);
-} 
+    fn _call_signal(
+        arg0: u64,
+        arg1: u64,
+        arg2: u64,
+        arg3: u64,
+        handler_addr: u64,
+        stack_pointer: u64,
+    );
+}
 
 use core::sync::atomic::{AtomicBool, Ordering};
 
@@ -34,15 +41,21 @@ impl SignalSubscriber {
         }
 
         if let Some(old_pid) = process::load_space(self.pid) {
-            _call_signal(arg0, arg1, arg2, arg3, self.handler_addr, USER_SIGNAL_STACK_TOP);
+            _call_signal(
+                arg0,
+                arg1,
+                arg2,
+                arg3,
+                self.handler_addr,
+                USER_SIGNAL_STACK_TOP,
+            );
             self.ready.store(true, Ordering::SeqCst);
-            
+
             process::load_space(old_pid).unwrap();
             true
         } else {
             false
         }
-
     }
 }
 
@@ -78,14 +91,26 @@ impl SignalBus {
         self.channels.contains_key(&channel)
     }
 
-    pub unsafe fn call(&mut self, channel: u64, arg0: u64, arg1: u64, arg2: u64, arg3: u64) -> Option<()> {
-        self.channels.get_mut(&channel)?.retain(|subscriber| subscriber.call(arg0,arg1,arg2,arg3));
+    pub unsafe fn call(
+        &mut self,
+        channel: u64,
+        arg0: u64,
+        arg1: u64,
+        arg2: u64,
+        arg3: u64,
+    ) -> Option<()> {
+        self.channels
+            .get_mut(&channel)?
+            .retain(|subscriber| subscriber.call(arg0, arg1, arg2, arg3));
         Some(())
     }
 
     pub fn subscribe(&mut self, channel: u64, pid: u64, handler_addr: u64) -> Option<()> {
         self.channels.get_mut(&channel)?.push(SignalSubscriber {
-            channel, pid, handler_addr, ready: AtomicBool::new(true),
+            channel,
+            pid,
+            handler_addr,
+            ready: AtomicBool::new(true),
         });
         Some(())
     }

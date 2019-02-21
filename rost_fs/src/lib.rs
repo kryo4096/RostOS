@@ -6,11 +6,9 @@
 #[macro_use]
 extern crate alloc;
 
-pub mod node;
 pub mod disk;
 pub mod fs;
-
+pub mod node;
 
 #[cfg(test)]
 mod tests;
-

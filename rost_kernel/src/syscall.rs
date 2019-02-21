@@ -1,17 +1,17 @@
-use memory;
-use x86_64::instructions::port::*;
-use x86_64::registers::model_specific::{Efer, EferFlags, Msr};
 use alloc::string::String;
 use alloc::vec::Vec;
+use consts::*;
 use fs;
 use fs::is_file;
 use fs::path::Path;
+use memory;
 use process::WaitReason;
 use process::{self, Process};
 use time;
-use consts::*;
+use x86_64::instructions::port::*;
+use x86_64::registers::model_specific::{Efer, EferFlags, Msr};
 use x86_64::structures::paging::PageTableFlags;
-
+use process::signal;
 
 extern "C" {
     fn syscall_handler();
@@ -43,7 +43,7 @@ pub unsafe extern "C" fn __syscall(
         0x2 => debug(rsi, rdx),
         0x10 => time(),
         0x20 => subscribe(rsi, rdx),
-        0x21 => add_channel(rsi),
+        0x21 => add_channel(),
         0x22 => send(rsi, rdx, rcx, r8, r9),
         0x30 => get_pid(),
         0x31 => exit(),
@@ -64,32 +64,35 @@ unsafe fn print(ptr: u64, len: u64) -> i64 {
     0
 }
 
-
-use process::signal;
-
-pub unsafe fn add_channel(id: u64) -> i64 {
+pub unsafe fn add_channel() -> i64 {
     let mut bus = signal::signal_bus();
     bus.alloc_channel() as _
 }
 
 pub unsafe fn subscribe(channel: u64, handler_addr: u64) -> i64 {
-    if signal::signal_bus().subscribe(channel, process::current_pid(), handler_addr).is_some() {
-        0 
+    if signal::signal_bus()
+        .subscribe(channel, process::current_pid(), handler_addr)
+        .is_some()
+    {
+        0
     } else {
         -1
     }
 }
 
 pub unsafe fn send(channel: u64, arg0: u64, arg1: u64, arg2: u64, arg3: u64) -> i64 {
-    if signal::signal_bus().call(channel, arg0,arg1,arg2,arg3).is_some() {
-        0 
+    if signal::signal_bus()
+        .call(channel, arg0, arg1, arg2, arg3)
+        .is_some()
+    {
+        0
     } else {
         -1
     }
 }
 
 unsafe fn get_pid() -> i64 {
-    ::process::current_pid() as _ 
+    ::process::current_pid() as _
 }
 
 unsafe fn exit() -> i64 {
@@ -116,14 +119,11 @@ unsafe fn execute(path_ptr: u64, path_len: u64) -> i64 {
 
         process::schedule(pid);
 
-
-
         pid as _
     } else {
         -1
     }
 }
-
 
 unsafe fn wait_exit(pid: u64) -> i64 {
     process::wait(::process::WaitReason::ProcessExit(pid));
@@ -155,9 +155,7 @@ unsafe fn time() -> i64 {
     time::get() as _
 }
 
-
 unsafe fn vmap(start: u64, end: u64) -> i64 {
-
     if start >= 256 * P4_ENTRY_SIZE || end >= 256 * P4_ENTRY_SIZE {
         return -1;
     }
@@ -171,7 +169,6 @@ unsafe fn vmap(start: u64, end: u64) -> i64 {
 }
 
 unsafe fn pmap(virt: u64, phys: u64) -> i64 {
-
     if virt >= 256 * P4_ENTRY_SIZE {
         return -1;
     }

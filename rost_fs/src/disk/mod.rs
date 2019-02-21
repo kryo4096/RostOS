@@ -68,7 +68,7 @@ impl RamDisk {
         }
     }
 
-    pub unsafe fn init(&mut self, start_addr: u64, size: u64){
+    pub unsafe fn init(&mut self, start_addr: u64, size: u64) {
         *self = Self {
             start: Unique::new_unchecked((start_addr & !0xfff) as _),
             block_count: (size & !0xfff) / BLOCK_SIZE,

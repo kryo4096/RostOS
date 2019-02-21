@@ -7,8 +7,6 @@ use crate::syscall::{self, *};
 
 struct DebugPrinter;
 
-
-
 impl fmt::Write for DebugPrinter {
     fn write_str(&mut self, s: &str) -> fmt::Result {
         let bytes = s.as_bytes();
@@ -24,7 +22,7 @@ pub fn write_bytes(bytes: &[u8]) {
     if bytes.len() == 0 {
         return;
     }
-    
+
     unsafe {
         syscall!(SYS_DEBUG_PRINT, bytes.as_ptr(), bytes.len());
     }

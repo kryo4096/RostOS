@@ -1,5 +1,5 @@
-use alloc::vec::Vec;
 use alloc::collections::BinaryHeap;
+use alloc::vec::Vec;
 
 use crate::disk::{self, Disk};
 
@@ -31,22 +31,19 @@ pub struct NodeTree<'a, D: disk::Disk> {
 
 impl<'a, D: disk::Disk> NodeTree<'a, D> {
     pub fn new(disk: &'a mut D) -> NodeTree<'a, D> {
-        NodeTree {
-            disk,
-        }
+        NodeTree { disk }
     }
 }
 
-impl<'a, D: disk::Disk> NodeSet<'a> for NodeTree<'a, D>  {
+impl<'a, D: disk::Disk> NodeSet<'a> for NodeTree<'a, D> {
     type Disk = D;
 
     fn insert_node(&'a self, key: i64) -> NodeResult<Node<'a, D>> {
         if let Ok(addr) = tree::insert_node(self.disk, key) {
-
-        Ok(Node {
-            disk: self.disk,
-            addr,
-        })
+            Ok(Node {
+                disk: self.disk,
+                addr,
+            })
         } else {
             Err(NodeError::InsertionError)
         }
@@ -54,11 +51,10 @@ impl<'a, D: disk::Disk> NodeSet<'a> for NodeTree<'a, D>  {
 
     fn search_node(&'a self, key: i64) -> NodeResult<Node<'a, D>> {
         if let Some(addr) = tree::search_node(self.disk, key) {
-
-        Ok(Node {
-            disk: self.disk,
-            addr,
-        })
+            Ok(Node {
+                disk: self.disk,
+                addr,
+            })
         } else {
             Err(NodeError::SearchError)
         }
@@ -113,6 +109,3 @@ impl<'a, D: disk::Disk> PartialEq for Node<'a, D> {
         self.addr == other.addr
     }
 }
-
-
-

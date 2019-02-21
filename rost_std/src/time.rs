@@ -1,4 +1,4 @@
-///! This module allows access to the time-keeping functionality of the OS. Time is not kept in real-life units, but in PIT-ticks. 
+///! This module allows access to the time-keeping functionality of the OS. Time is not kept in real-life units, but in PIT-ticks.
 
 #[macro_use]
 use crate::syscall::{self, *};
@@ -13,7 +13,7 @@ impl Time {
     /// Returns the current point in time.
     pub fn current() -> Self {
         Self {
-            tick_count: unsafe {syscall!(SYS_GET_TIME)}
+            tick_count: unsafe { syscall!(SYS_GET_TIME) },
         }
     }
 

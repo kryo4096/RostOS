@@ -1,8 +1,8 @@
+use crate::disk::{Disk, DiskAddress};
+use crate::node::node::{self, Node};
 use core::fmt::Debug;
 use core::mem;
 use core::option::NoneError;
-use crate::disk::{Disk, DiskAddress};
-use crate::node::node::{self, Node};
 
 use alloc::vec::Vec;
 
@@ -103,9 +103,7 @@ pub fn write_to_data_block(
     mut data_block_addr: DiskAddress,
     data: &[u8],
 ) -> Result<(), NoneError> {
-    
     'blocks: for block_nr in 0..=data.len() / BLOCK_DATA_SIZE {
-
         let data_block = get_data_block(disk, data_block_addr)?;
 
         'bytes: for byte_nr in 0..BLOCK_DATA_SIZE {
@@ -134,9 +132,7 @@ pub fn copy_from_data_block(
     buffer: &mut Vec<u8>,
     size: u64,
 ) -> Result<(), NoneError> {
-
     'blocks: for block_nr in 0..=size as usize / BLOCK_DATA_SIZE {
-
         let data_block = get_data_block(disk, data_block_addr)?;
 
         'bytes: for byte_nr in 0..BLOCK_DATA_SIZE {
@@ -167,9 +163,7 @@ pub fn copy_slice_from_data_block(
     start: u64,
     end: u64,
 ) -> Result<(), NoneError> {
-
     'blocks: for block_nr in 0..=end as usize / BLOCK_DATA_SIZE {
-
         let data_block = get_data_block(disk, data_block_addr)?;
 
         'bytes: for byte_nr in 0..BLOCK_DATA_SIZE {
@@ -178,11 +172,10 @@ pub fn copy_slice_from_data_block(
             if index >= end as usize {
                 break 'blocks;
             }
-            
+
             if index >= start as usize {
                 buffer.push(data_block.data[byte_nr]);
             }
-            
         }
 
         if data_block.next_block.is_null() {
@@ -200,12 +193,10 @@ pub fn deallocate_data_block(
     disk: &impl Disk,
     data_block_addr: DiskAddress,
 ) -> Result<(), NoneError> {
-
     let data_block = get_data_block(disk, data_block_addr)?;
     if !data_block.next_block.is_null() {
         deallocate_data_block(disk, data_block.next_block);
-    } 
+    }
     deallocate_block(disk, data_block_addr);
     Ok(())
-
 }

@@ -81,7 +81,8 @@ pub(crate) fn map_segment(
                     // segment. Thus, we need to copy it before zeroing.
 
                     // TODO: search for a free page dynamically
-                    let temp_page: Page = Page::containing_address(VirtAddr::new(0xffff828000000000));
+                    let temp_page: Page =
+                        Page::containing_address(VirtAddr::new(0xffff828000000000));
                     let new_frame = frame_allocator
                         .allocate_frame(MemoryRegionType::Kernel)
                         .ok_or(MapToError::FrameAllocationFailed)?;
@@ -91,7 +92,8 @@ pub(crate) fn map_segment(
                         page_table_flags,
                         page_table,
                         frame_allocator,
-                    )?.flush();
+                    )?
+                    .flush();
 
                     type PageArray = [u64; Size4KiB::SIZE as usize / 8];
 
@@ -119,7 +121,8 @@ pub(crate) fn map_segment(
                         page_table_flags,
                         page_table,
                         frame_allocator,
-                    )?.flush();
+                    )?
+                    .flush();
                 }
 
                 // Map additional frames.

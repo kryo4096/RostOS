@@ -165,7 +165,8 @@ pub extern "C" fn load_elf(
         &segments,
         &mut rec_page_table,
         &mut frame_allocator,
-    ).expect("kernel mapping failed");
+    )
+    .expect("kernel mapping failed");
 
     // Map a page for the boot info structure
     let boot_info_page = {
@@ -180,7 +181,8 @@ pub extern "C" fn load_elf(
             flags,
             &mut rec_page_table,
             &mut frame_allocator,
-        ).expect("Mapping of bootinfo page failed")
+        )
+        .expect("Mapping of bootinfo page failed")
         .flush();
         page
     };
